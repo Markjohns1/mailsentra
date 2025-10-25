@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
+from app.database import engine
 
 # Configure logging
 logging.basicConfig(
@@ -58,6 +59,19 @@ def health_check():
     return {
         "status": "healthy",
         "service": "spam-detection-api"
+    }
+
+@app.get("/test-db")
+def test_database():
+    """Test database connection and verify tables exist"""
+    from sqlalchemy import inspect
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+    return {
+        "status": "success",
+        "database": "connected",
+        "tables": tables,
+        "count": len(tables)
     }
 
 # TODO: Include routers
