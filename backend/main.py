@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine
+from app.routes import auth, user, preprocessing
 
 # Configure logging
 logging.basicConfig(
@@ -16,7 +17,6 @@ async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     logger.info("Starting up Spam Detection API...")
     # TODO: Load ML model here
-    # TODO: Initialize database connection
     yield
     logger.info("Shutting down Spam Detection API...")
     # TODO: Cleanup resources
@@ -43,6 +43,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(user.router, prefix="/api/user", tags=["User"])
+app.include_router(preprocessing.router, prefix="/api/preprocessing", tags=["Preprocessing"])
 
 @app.get("/")
 def read_root():
@@ -73,15 +78,6 @@ def test_database():
         "tables": tables,
         "count": len(tables)
     }
-
-# TODO: Include routers
-# from app.routes import auth, user, analyze, logs, feedback, admin
-# app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-# app.include_router(user.router, prefix="/api/user", tags=["User"])
-# app.include_router(analyze.router, prefix="/api/analyze", tags=["Analysis"])
-# app.include_router(logs.router, prefix="/api/logs", tags=["Logs"])
-# app.include_router(feedback.router, prefix="/api/feedback", tags=["Feedback"])
-# app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 if __name__ == "__main__":
     import uvicorn
