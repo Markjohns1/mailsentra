@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { logsService } from '../../services/logsService'
+import { feedbackService } from '../../services/feedbackService'
 import { useToast } from '../../context/ToastContext'
 import { formatters } from '../../utils/formatters'
 
@@ -7,7 +8,8 @@ const LogsTable = () => {
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
-  const { showError } = useToast()
+  const [submitting, setSubmitting] = useState({})
+  const { showError, showSuccess, showInfo } = useToast()
 
   useEffect(() => {
     loadLogs()
@@ -23,6 +25,21 @@ const LogsTable = () => {
       showError('Failed to load logs')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleFeedback = async (logId, correctedResult) => {
+    setSubmitting({ ...submitting, [logId]: true })
+    
+    try {
+      await feedbackService.submitFeedback(logId, correctedResult)
+      showSuccess('Feedback submitted successfully! Thank you for helping improve our model.')
+      // Reload logs to show updated feedback status
+      loadLogs()
+    } catch (error) {
+      showError(error.response?.data?.detail || 'Failed to submit feedback')
+    } finally {
+      setSubmitting({ ...submitting, [logId]: false })
     }
   }
 
@@ -53,6 +70,7 @@ const LogsTable = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Result</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Confidence</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Feedback</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -72,6 +90,40 @@ const LogsTable = () => {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     {formatters.date(log.created_at)}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {log.is_correct === null ? (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleFeedback(log.id, 'spam')}
+                          disabled={submitting[log.id]}
+                          className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                            submitting[log.id]
+                              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                              : 'bg-red-100 text-red-700 hover:bg-red-200'
+                          }`}
+                          title="Mark this as spam if misclassified"
+                        >
+                          {submitting[log.id] ? '...' : 'Report Spam'}
+                        </button>
+                        <button
+                          onClick={() => handleFeedback(log.id, 'not spam')}
+                          disabled={submitting[log.id]}
+                          className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                            submitting[log.id]
+                              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                          title="Mark this as not spam if misclassified"
+                        >
+                          {submitting[log.id] ? '...' : 'Report Not Spam'}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-500 italic">
+                        {log.is_correct ? '✓ Accurate' : 'Feedback received'}
+                      </span>
+                    )}
                   </td>
                 </tr>
               ))}
