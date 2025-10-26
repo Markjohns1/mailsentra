@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine
-from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys
+from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys, metrics
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -76,6 +76,7 @@ app.include_router(feedback.router, prefix="/api", tags=["Feedback"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(retrain.router, prefix="/api/retrain", tags=["Retraining"])
 app.include_router(api_keys.router, prefix="/api/token", tags=["API Keys"])
+app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
 
 @app.get("/")
 def read_root():
