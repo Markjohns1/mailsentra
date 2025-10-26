@@ -5,10 +5,10 @@ const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth()
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-lg">
+    <nav className="bg-white dark:bg-gray-800 shadow-lg animate-fade-in">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center">
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <span className="text-2xl font-bold text-blue-600">MailSentra</span>
           </Link>
 
