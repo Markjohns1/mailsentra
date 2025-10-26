@@ -5,6 +5,7 @@ from app.routes import analyze
 from app.routes import logs
 from app.routes import feedback
 from app.routes import admin
+from app.routes import retrain
 
-__all__ = ["auth", "user", "preprocessing", "analyze", "logs", "feedback", "admin"]
+__all__ = ["auth", "user", "preprocessing", "analyze", "logs", "feedback", "admin", "retrain"]
 

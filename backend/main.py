@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine
-from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin
+from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain
 
 # Configure logging
 logging.basicConfig(
@@ -52,6 +52,7 @@ app.include_router(analyze.router, prefix="/api/analyze", tags=["Analysis"])
 app.include_router(logs.router, prefix="/api", tags=["Logs"])
 app.include_router(feedback.router, prefix="/api", tags=["Feedback"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(retrain.router, prefix="/api/retrain", tags=["Retraining"])
 
 @app.get("/")
 def read_root():
