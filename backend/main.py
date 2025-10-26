@@ -1,9 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine
-from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain
+from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys
+from slowapi.errors import RateLimitExceeded
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
 
 # Configure logging
 logging.basicConfig(
@@ -30,6 +36,22 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Initialize rate limiter
+app.state.limiter = limiter
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    """Handle rate limit exceeded errors."""
+    return JSONResponse(
+        status_code=429,
+        content={
+            "detail": "Rate limit exceeded. Please try again later.",
+            "retry_after": str(exc.retry_after)
+        },
+        headers={"Retry-After": str(exc.retry_after)}
+    )
+
 # CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
@@ -53,6 +75,7 @@ app.include_router(logs.router, prefix="/api", tags=["Logs"])
 app.include_router(feedback.router, prefix="/api", tags=["Feedback"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(retrain.router, prefix="/api/retrain", tags=["Retraining"])
+app.include_router(api_keys.router, prefix="/api/token", tags=["API Keys"])
 
 @app.get("/")
 def read_root():
