@@ -25,7 +25,7 @@ def download_dataset():
     Download SMS Spam Collection dataset
     Dataset: https://archive.ics.uci.edu/ml/datasets/SMS+Spam+Collection
     """
-    logger.info("📥 Downloading spam dataset...")
+    logger.info("Downloading spam dataset...")
     
     try:
         # URL for SMS Spam Collection
@@ -37,12 +37,12 @@ def download_dataset():
         
         # Download
         urllib.request.urlretrieve(url, "smsspamcollection.zip")
-        logger.info("✅ Dataset downloaded")
+        logger.info(" Dataset downloaded")
         
         # Extract
         with zipfile.ZipFile("smsspamcollection.zip", 'r') as zip_ref:
             zip_ref.extractall("dataset")
-        logger.info("✅ Dataset extracted")
+        logger.info(" Dataset extracted")
         
         # Clean up
         os.remove("smsspamcollection.zip")
@@ -50,8 +50,8 @@ def download_dataset():
         return "dataset/SMSSpamCollection"
         
     except Exception as e:
-        logger.error(f"❌ Error downloading dataset: {e}")
-        logger.info("💡 Creating sample dataset instead...")
+        logger.error(f" Error downloading dataset: {e}")
+        logger.info(" Creating sample dataset instead...")
         return create_sample_dataset()
 
 def create_sample_dataset():
@@ -72,12 +72,12 @@ def create_sample_dataset():
     
     df = pd.DataFrame(sample_data)
     df.to_csv('dataset/sample_spam.csv', index=False)
-    logger.info("✅ Sample dataset created")
+    logger.info(" Sample dataset created")
     return 'dataset/sample_spam.csv'
 
 def load_dataset(filepath):
     """Load and prepare the spam dataset"""
-    logger.info(f"📂 Loading dataset from {filepath}")
+    logger.info(f" Loading dataset from {filepath}")
     
     try:
         if 'SMSSpamCollection' in filepath:
@@ -87,14 +87,14 @@ def load_dataset(filepath):
             # Sample dataset format
             df = pd.read_csv(filepath)
         
-        logger.info(f"✅ Loaded {len(df)} messages")
+        logger.info(f" Loaded {len(df)} messages")
         logger.info(f"   - Spam: {(df['label'] == 'spam').sum()}")
         logger.info(f"   - Ham: {(df['label'] == 'ham').sum()}")
         
         return df
         
     except Exception as e:
-        logger.error(f"❌ Error loading dataset: {e}")
+        logger.error(f" Error loading dataset: {e}")
         raise
 
 def preprocess_dataset(df):
@@ -107,13 +107,13 @@ def preprocess_dataset(df):
         processed_messages.append(result['final_processed_text'])
     
     df['processed_message'] = processed_messages
-    logger.info("✅ Preprocessing complete")
+    logger.info(" Preprocessing complete")
     
     return df
 
 def train_model(df):
     """Train Naive Bayes classifier"""
-    logger.info("🧠 Training Naive Bayes model...")
+    logger.info(" Training Naive Bayes model...")
     
     # Prepare data
     X = df['processed_message']
@@ -141,21 +141,21 @@ def train_model(df):
     
     # Calculate accuracy
     accuracy = accuracy_score(y_test, y_pred)
-    logger.info(f"✅ Model trained successfully!")
+    logger.info(f" Model trained successfully!")
     logger.info(f"   - Accuracy: {accuracy * 100:.2f}%")
     
     # Detailed metrics
-    logger.info("\n📊 Classification Report:")
+    logger.info("\n Classification Report:")
     print(classification_report(y_test, y_pred))
     
-    logger.info("\n📊 Confusion Matrix:")
+    logger.info("\n Confusion Matrix:")
     print(confusion_matrix(y_test, y_pred))
     
     return model, vectorizer, accuracy
 
 def save_model(model, vectorizer, accuracy):
     """Save trained model and vectorizer"""
-    logger.info("💾 Saving model...")
+    logger.info(" Saving model...")
     
     import os
     os.makedirs('ml_models', exist_ok=True)
@@ -176,7 +176,7 @@ def save_model(model, vectorizer, accuracy):
     with open(model_path, 'wb') as f:
         pickle.dump(metadata, f)
     
-    logger.info(f"✅ Model saved to {model_path}")
+    logger.info(f" Model saved to {model_path}")
     logger.info(f"   - Version: 1.0.0")
     logger.info(f"   - Accuracy: {accuracy * 100:.2f}%")
     
@@ -185,7 +185,7 @@ def save_model(model, vectorizer, accuracy):
 def main():
     """Main training pipeline"""
     logger.info("=" * 60)
-    logger.info("🚀 Starting Spam Detection Model Training")
+    logger.info(" Starting Spam Detection Model Training")
     logger.info("=" * 60)
     
     try:
@@ -205,13 +205,13 @@ def main():
         model_path = save_model(model, vectorizer, accuracy)
         
         logger.info("=" * 60)
-        logger.info("✅ Training Complete!")
+        logger.info(" Training Complete!")
         logger.info(f"   Model saved at: {model_path}")
         logger.info(f"   Accuracy: {accuracy * 100:.2f}%")
         logger.info("=" * 60)
         
     except Exception as e:
-        logger.error(f"❌ Training failed: {e}")
+        logger.error(f" Training failed: {e}")
         raise
 
 if __name__ == "__main__":
