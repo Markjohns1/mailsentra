@@ -7,6 +7,7 @@ from app.routes import feedback
 from app.routes import admin
 from app.routes import retrain
 from app.routes import api_keys
+from app.routes import metrics
 
-__all__ = ["auth", "user", "preprocessing", "analyze", "logs", "feedback", "admin", "retrain", "api_keys"]
+__all__ = ["auth", "user", "preprocessing", "analyze", "logs", "feedback", "admin", "retrain", "api_keys", "metrics"]
 
