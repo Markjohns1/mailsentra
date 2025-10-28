@@ -83,34 +83,35 @@ MailSentra follows a **three-tier architecture** pattern:
 
 ```
 backend/app/
-├── models/                 # SQLAlchemy ORM models
+│
+├── models/                    # SQLAlchemy ORM models
 │   ├── user.py
 │   ├── spam_log.py
 │   ├── feedback.py
 │   └── email.py
 │
-├── routes/                 # API endpoint handlers
-│   ├── auth.py            # Authentication endpoints
-│   ├── analyze.py         # Email analysis
-│   ├── logs.py            # Log management
-│   ├── feedback.py        # Feedback system
-│   ├── retrain.py         # Model retraining
-│   ├── metrics.py         # Analytics
-│   └── admin.py           # Admin operations
+├── routes/                    # API endpoint handlers
+│   ├── auth.py               # Authentication endpoints
+│   ├── analyze.py            # Email analysis
+│   ├── logs.py               # Log management
+│   ├── feedback.py           # Feedback system
+│   ├── retrain.py            # Model retraining
+│   ├── metrics.py            # Analytics
+│   └── admin.py              # Admin operations
 │
-├── services/              # Business logic layer
-│   ├── model_service.py   # ML model operations
-│   ├── preprocessing.py   # Text preprocessing
-│   ├── auth_service.py    # Authentication logic
-│   └── email_service.py   # Email operations
+├── services/                  # Business logic layer
+│   ├── model_service.py      # ML model operations
+│   ├── preprocessing.py      # Text preprocessing
+│   ├── auth_service.py       # Authentication logic
+│   └── email_service.py      # Email operations
 │
-├── utils/                 # Helper functions
-│   ├── logger.py          # Logging configuration
-│   └── security.py        # Security utilities
+├── utils/                     # Helper functions
+│   ├── logger.py             # Logging configuration
+│   └── security.py           # Security utilities
 │
-├── config.py              # Configuration management
-├── database.py            # Database connection
-└── dependencies.py        # FastAPI dependencies
+├── config.py                  # Configuration management
+├── database.py                # Database connection
+└── dependencies.py            # FastAPI dependencies
 ```
 
 ### Request Flow
