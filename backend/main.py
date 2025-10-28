@@ -8,6 +8,11 @@ from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from app.routes import admin
+
+from app.routes import admin
+
+
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -36,6 +41,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 # Initialize rate limiter
 app.state.limiter = limiter
 

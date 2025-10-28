@@ -1,6 +1,4 @@
-"""
-API key management endpoints.
-"""
+"""API key management endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -18,9 +16,9 @@ from app.database import Base
 
 router = APIRouter()
 
-
-class APIKey(Base):
-    """API Key model."""
+"""API Key model."""
+"""class APIKey(Base):
+    
     __tablename__ = "api_keys"
     
     id = Column(Integer, primary_key=True, index=True)
@@ -30,8 +28,8 @@ class APIKey(Base):
     is_active = Column(Boolean, default=True)
     last_used = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    expires_at = Column(DateTime(timezone=True), nullable=True)
-
+   expires_at = Column(DateTime(timezone=True), nullable=True)
+"""
 
 class GenerateKeyRequest(BaseModel):
     key_name: str
@@ -64,10 +62,10 @@ def generate_api_key_endpoint(
     """
     Generate a new API key for authenticated user.
     
-    Parameters:
-        request: Key name and expiration
+    Parameters i take here include:-
+        request:     Key name and expiration
         current_user: Authenticated user
-        db: Database session
+        db:           Database session
     
     Returns:
         Generated API key (displayed only once)
@@ -216,4 +214,3 @@ def verify_api_key(key: str, db: Session) -> APIKey:
     db.commit()
     
     return db_key
-

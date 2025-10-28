@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from typing import Dict, Any
 from datetime import datetime
 import logging
+import sys
+import os
 
 from app.database import get_db
 from app.models.spam_log import SpamLog
@@ -26,87 +28,176 @@ class RetrainResponse(BaseModel):
     training_stats: Dict[str, Any]
 
 
+class RetrainStatusResponse(BaseModel):
+    ready_to_retrain: bool
+    feedback_count: int
+    min_required: int
+    message: str
+
+
+@router.get("/retrain/status", response_model=RetrainStatusResponse)
+def get_retrain_status(
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Check if model is ready for retraining
+    Returns feedback count and whether minimum threshold is met
+    """
+    try:
+        min_feedback = 10
+        feedback_count = db.query(UserFeedback).filter(
+            UserFeedback.original_result != UserFeedback.corrected_result
+        ).count()
+        
+        ready = feedback_count >= min_feedback
+        
+        return RetrainStatusResponse(
+            ready_to_retrain=ready,
+            feedback_count=feedback_count,
+            min_required=min_feedback,
+            message=f"{'Ready to retrain' if ready else f'Need {min_feedback - feedback_count} more feedback samples'}"
+        )
+    except Exception as e:
+        logger.error(f"Error checking retrain status: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+
+@router.post("/train", response_model=RetrainResponse)
+def train_initial_model(
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Train model from scratch using the SMS Spam Collection dataset.
+    Requires admin authentication.
+
+    Returns:
+        Training results with accuracy and version
+    """
+    try:
+        logger.info(f"Initial training request initiated by admin {current_user.username}")
+
+        # Import and run training function
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from train_model import main as train_main
+
+        # Run training
+        train_main()
+
+        # Reload the model in the service
+        from app.services.model_service import spam_model
+        spam_model.load_model()
+
+        logger.info(f"Model trained successfully")
+
+        return RetrainResponse(
+            message="Model trained successfully from dataset",
+            success=True,
+            training_stats={
+                "accuracy": spam_model.metadata.get('accuracy', 0),
+                "version": str(spam_model.metadata.get('version', 'unknown')),
+                "training_samples": 5574,
+                "trained_at": datetime.now().isoformat()
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Training failed: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Training failed: {str(e)}"
+        )
+
+
 @router.post("/retrain", response_model=RetrainResponse)
 def retrain_model(
-    min_feedback_count: int = 50,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """
     Retrain spam detection model using user feedback data.
     Requires admin authentication.
-    
+
     Parameters:
-        min_feedback_count: Minimum feedback samples required for retraining
         current_user: Authenticated admin user
         db: Database session
-    
+
     Returns:
         Training results with accuracy and version
     """
     try:
         logger.info(f"Retraining request initiated by admin {current_user.username}")
+
+        min_feedback_count = 10
         
-        # Check if sufficient feedback data exists
-        feedback_count = db.query(UserFeedback).count()
-        
-        if feedback_count < min_feedback_count:
+        # Get feedback data - only misclassifications
+        feedbacks = db.query(UserFeedback).filter(
+            UserFeedback.original_result != UserFeedback.corrected_result
+        ).all()
+
+        if len(feedbacks) < min_feedback_count:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Insufficient feedback data. Need {min_feedback_count}, have {feedback_count}"
+                detail=f"Insufficient feedback data. Need {min_feedback_count}, have {len(feedbacks)}"
             )
-        
-        # Collect feedback data
-        feedbacks = db.query(UserFeedback).all()
-        spam_logs = db.query(SpamLog).filter(
-            SpamLog.id.in_([f.spam_log_id for f in feedbacks])
-        ).all()
-        
+
+        logger.info(f"Collecting {len(feedbacks)} misclassified samples...")
+
         # Prepare training data
         training_data = []
         for feedback in feedbacks:
-            spam_log = next((sl for sl in spam_logs if sl.id == feedback.spam_log_id), None)
-            if spam_log:
+            spam_log = db.query(SpamLog).filter(
+                SpamLog.id == feedback.spam_log_id
+            ).first()
+            
+            if spam_log and spam_log.email_text:
                 training_data.append({
                     'text': spam_log.email_text,
-                    'label': feedback.corrected_result.lower(),
-                    'original': feedback.original_result.lower()
+                    'label': feedback.corrected_result.lower().strip()
                 })
-        
-        # Import training function
-        import sys
-        import os
+
+        if not training_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No valid training data found in feedback"
+            )
+
+        logger.info(f"Prepared {len(training_data)} training samples")
+
+        # Import and run training function
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         from train_model import train_model_from_data
-        
+
         # Retrain model
-        logger.info(f"Retraining model with {len(training_data)} samples")
         accuracy, version = train_model_from_data(training_data)
-        
+
         # Reload the updated model in the service
         from app.services.model_service import spam_model
         spam_model.load_model()
-        
-        logger.info(f"Model retrained successfully. New accuracy: {accuracy * 100:.2f}%")
-        
+
+        logger.info(f"Model v{version} retrained successfully. New accuracy: {accuracy * 100:.2f}%")
+
         return RetrainResponse(
-            message="Model retrained successfully",
+            message=f"Model retrained successfully to v{version}",
             success=True,
             training_stats={
-                "accuracy": accuracy,
-                "version": version,
+                "accuracy": float(accuracy),
+                "version": str(version),
                 "training_samples": len(training_data),
-                "previous_feedback_count": feedback_count,
+                "feedback_used": len(feedbacks),
                 "retrained_at": datetime.now().isoformat()
             }
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Retraining failed: {e}")
+        logger.error(f"Retraining failed: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Retraining failed: {str(e)}"
         )
-

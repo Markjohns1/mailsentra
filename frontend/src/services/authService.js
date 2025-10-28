@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 
 const BASE_URL = 'http://localhost:8000/api/auth'
 
@@ -26,7 +26,7 @@ export const authService = {
     if (!token) {
       throw new Error('No token found')
     }
-    
+
     const response = await axios.get(`${BASE_URL}/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -39,4 +39,3 @@ export const authService = {
     localStorage.removeItem('token')
   },
 }
-

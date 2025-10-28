@@ -42,6 +42,14 @@ def get_current_user(
             detail="Inactive user"
         )
     
+    # Update user admin status from token (in case it changed since token was issued)
+    # This ensures the user object has the most current admin status
+    token_is_admin = payload.get("is_admin", False)
+    if user.is_admin != token_is_admin:
+        # If admin status changed, we should ideally reissue the token
+        # For now, we'll log this but use the database value
+        print(f"Admin status mismatch for {email}: token={token_is_admin}, db={user.is_admin}")
+    
     return user
 
 def get_current_active_user(

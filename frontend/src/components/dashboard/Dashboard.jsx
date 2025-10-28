@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { BarChart3, AlertTriangle, CheckCircle } from 'lucide-react'
 import AnalyzeEmail from './AnalyzeEmail'
 import LogsTable from './LogsTable'
 import StatsCard from './StatsCard'
@@ -45,19 +46,19 @@ const Dashboard = ({ user }) => {
         <StatsCard
           title="Total Analyses"
           value={stats.total_analyses}
-          icon="📊"
+          icon={<BarChart3 className="w-6 h-6" />}
           color="blue"
         />
         <StatsCard
           title="Spam Detected"
           value={stats.spam_detected}
-          icon="⚠️"
+          icon={<AlertTriangle className="w-6 h-6" />}
           color="red"
         />
         <StatsCard
           title="Ham Detected"
           value={stats.ham_detected}
-          icon="✅"
+          icon={<CheckCircle className="w-6 h-6" />}
           color="green"
         />
       </div>
@@ -71,4 +72,3 @@ const Dashboard = ({ user }) => {
 }
 
 export default Dashboard
-

@@ -21,7 +21,7 @@ class UserResponse(BaseModel):
     email: str
     is_active: bool
     is_admin: bool
-    
+
     class Config:
         from_attributes = True
 
@@ -39,24 +39,24 @@ def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered"
+            detail="Username already registered! Try a different one."
         )
-    
+
     # Check if email already exists
     existing_email = db.query(User).filter(User.email == user_data.email).first()
     if existing_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            detail="Email already registered!"
         )
-    
+
     # Validate password length
     if len(user_data.password) < 8:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password must be at least 8 characters"
         )
-    
+
     # Create new user
     hashed_password = get_password_hash(user_data.password)
     new_user = User(
@@ -66,11 +66,11 @@ def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
         is_active=True,
         is_admin=False
     )
-    
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    
+
     return new_user
 
 @router.post("/login", response_model=Token)
@@ -80,18 +80,18 @@ def login(
 ):
     """
     Login user and return JWT token
-    OAuth2 compatible - uses 'username' field for email
+    OAuth2 compatible...uses 'username' field for email
     """
     # Find user by email (OAuth2 uses 'username' field)
     user = db.query(User).filter(User.email == form_data.username).first()
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Verify password
     if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
@@ -99,17 +99,21 @@ def login(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Check if user is active
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive user"
         )
-    
-    # Create access token
-    access_token = create_access_token(data={"sub": user.email})
-    
+
+    # Create access token WITH ADMIN STATUS - THIS IS THE FIX!
+    access_token = create_access_token(data={
+        "sub": user.email,
+        "is_admin": user.is_admin,
+        "user_id": user.id
+    })
+
     return {
         "access_token": access_token,
         "token_type": "bearer"
@@ -128,4 +132,4 @@ def logout_user():
     """
     Logout endpoint (client-side token removal)
     """
-    return {"message": "Logged out successfully"}
+    return {"message": "You logged out successfully"}

@@ -46,7 +46,7 @@ def analyze_email(
         Analysis result with confidence score
     """
     try:
-        logger.info(f"📧 Analyzing email for user {current_user.id}")
+        logger.info(f"Analyzing email for user {current_user.id}")
         
         if not request.email_text or len(request.email_text.strip()) == 0:
             raise HTTPException(
@@ -82,7 +82,7 @@ def analyze_email(
         db.commit()
         db.refresh(spam_log)
         
-        logger.info(f"✅ Analysis complete: {result.upper()} (confidence: {confidence*100:.2f}%)")
+        logger.info(f"Analysis complete: {result.upper()} (confidence: {confidence*100:.2f}%)")
         
         return AnalyzeResponse(
             result=result,
@@ -98,7 +98,7 @@ def analyze_email(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Analysis error: {e}")
+        logger.error(f"Analysis error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Analysis failed: {str(e)}"
@@ -113,7 +113,7 @@ def get_model_info():
         info = spam_model.get_model_info()
         return info
     except Exception as e:
-        logger.error(f"❌ Error getting model info: {e}")
+        logger.error(f"Error getting model info: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get model info: {str(e)}"

@@ -53,7 +53,7 @@ def train_model_from_data(training_data):
             labels = df_feedback['label'].tolist()
         
         # Preprocess all messages
-        logger.info("Preprocessing messages")
+        logger.info("Preprocessing messages...")
         processed_messages = []
         for message in messages:
             result = email_preprocessor.preprocess_email(str(message), return_steps=False)
