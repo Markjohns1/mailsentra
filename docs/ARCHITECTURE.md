@@ -83,34 +83,34 @@ MailSentra follows a **three-tier architecture** pattern:
 
 ```
 backend/app/
-â”œâ”€â”€ models/          # SQLAlchemy ORM models
-â”‚   â”œâ”€â”€ user.py
-â”‚   â”œâ”€â”€ spam_log.py
-â”‚   â”œâ”€â”€ feedback.py
-â”‚   â””â”€â”€ email.py
-â”‚
-â”œâ”€â”€ routes/          # API endpoint handlers
-â”‚   â”œâ”€â”€ auth.py      # Authentication endpoints
-â”‚   â”œâ”€â”€ analyze.py   # Email analysis
-â”‚   â”œâ”€â”€ logs.py      # Log management
-â”‚   â”œâ”€â”€ feedback.py  # Feedback system
-â”‚   â”œâ”€â”€ retrain.py   # Model retraining
-â”‚   â”œâ”€â”€ metrics.py   # Analytics
-â”‚   â””â”€â”€ admin.py     # Admin operations
-â”‚
-â”œâ”€â”€ services/        # Business logic layer
-â”‚   â”œâ”€â”€ model_service.py      # ML model operations
-â”‚   â”œâ”€â”€ preprocessing.py      # Text preprocessing
-â”‚   â”œâ”€â”€ auth_service.py       # Authentication logic
-â”‚   â””â”€â”€ email_service.py      # Email operations
-â”‚
-â”œâ”€â”€ utils/           # Helper functions
-â”‚   â”œâ”€â”€ logger.py    # Logging configuration
-â”‚   â””â”€â”€ security.py  # Security utilities
-â”‚
-â”œâ”€â”€ config.py        # Configuration management
-â”œâ”€â”€ database.py      # Database connection
-â””â”€â”€ dependencies.py  # FastAPI dependencies
+├── models/                 # SQLAlchemy ORM models
+│   ├── user.py
+│   ├── spam_log.py
+│   ├── feedback.py
+│   └── email.py
+│
+├── routes/                 # API endpoint handlers
+│   ├── auth.py            # Authentication endpoints
+│   ├── analyze.py         # Email analysis
+│   ├── logs.py            # Log management
+│   ├── feedback.py        # Feedback system
+│   ├── retrain.py         # Model retraining
+│   ├── metrics.py         # Analytics
+│   └── admin.py           # Admin operations
+│
+├── services/              # Business logic layer
+│   ├── model_service.py   # ML model operations
+│   ├── preprocessing.py   # Text preprocessing
+│   ├── auth_service.py    # Authentication logic
+│   └── email_service.py   # Email operations
+│
+├── utils/                 # Helper functions
+│   ├── logger.py          # Logging configuration
+│   └── security.py        # Security utilities
+│
+├── config.py              # Configuration management
+├── database.py            # Database connection
+└── dependencies.py        # FastAPI dependencies
 ```
 
 ### Request Flow
