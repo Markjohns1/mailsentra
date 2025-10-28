@@ -1,42 +1,109 @@
-﻿# Contributing to MailSentra
+# Contributing to MailSentra
 
 Thank you for your interest in contributing to MailSentra! This document provides guidelines and instructions for contributing.
 
----
+## 📋 Table of Contents
 
-## Code of Conduct
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [How to Contribute](#how-to-contribute)
+- [Development Workflow](#development-workflow)
+- [Coding Standards](#coding-standards)
+- [Commit Guidelines](#commit-guidelines)
+- [Pull Request Process](#pull-request-process)
 
-By participating in this project, you agree to abide by our Code of Conduct:
+## 📜 Code of Conduct
 
-- Be respectful and inclusive
-- Welcome newcomers and help them learn
-- Focus on constructive feedback
-- Respect differing viewpoints
+### Our Pledge
+
+We are committed to providing a welcoming and inclusive environment for all contributors, regardless of experience level, gender, gender identity and expression, sexual orientation, disability, personal appearance, body size, race, ethnicity, age, religion, or nationality.
+
+### Expected Behavior
+
+- Use welcoming and inclusive language
+- Be respectful of differing viewpoints and experiences
+- Gracefully accept constructive criticism
+- Focus on what is best for the community
 - Show empathy towards other community members
 
----
+### Unacceptable Behavior
 
-## How to Contribute
+- Trolling, insulting/derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information without permission
+- Other conduct which could reasonably be considered inappropriate
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Before contributing, ensure you have:
+- Python 3.13+
+- Node.js 22.21.0+
+- Git
+- A GitHub account
+- Basic knowledge of FastAPI and React
+
+### Setting Up Your Development Environment
+
+1. **Fork the repository**
+   ```bash
+   # Click the 'Fork' button on GitHub
+   ```
+
+2. **Clone your fork**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/mailsentra.git
+   cd mailsentra
+   ```
+
+3. **Add upstream remote**
+   ```bash
+   git remote add upstream https://github.com/Markjohns1/mailsentra.git
+   ```
+
+4. **Set up the backend**
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt  # Development dependencies
+   ```
+
+5. **Set up the frontend**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+6. **Create a feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+## 🤝 How to Contribute
 
 ### Reporting Bugs
 
-Before creating bug reports, please check existing issues. When creating a bug report, include:
+If you find a bug, please create an issue with:
+- Clear, descriptive title
+- Detailed description of the bug
+- Steps to reproduce
+- Expected vs actual behavior
+- Screenshots (if applicable)
+- Environment details (OS, Python version, etc.)
 
-- **Clear title and description**
-- **Steps to reproduce**
-- **Expected vs actual behavior**
-- **Screenshots** (if applicable)
-- **Environment details** (OS, browser, versions)
-
-**Bug Report Template**:
+**Template:**
 ```markdown
-**Description**
+**Bug Description**
 A clear description of the bug.
 
-**To Reproduce**
+**Steps to Reproduce**
 1. Go to '...'
 2. Click on '...'
-3. See error
+3. Scroll down to '...'
+4. See error
 
 **Expected Behavior**
 What you expected to happen.
@@ -44,34 +111,256 @@ What you expected to happen.
 **Screenshots**
 If applicable, add screenshots.
 
-**Environment**:
-- OS: [e.g., Windows 10]
+**Environment:**
+- OS: [e.g., Windows 11, Ubuntu 22.04]
+- Python Version: [e.g., 3.13.0]
+- Node Version: [e.g., 22.21.0]
 - Browser: [e.g., Chrome 120]
-- Version: [e.g., 1.0.0]
 ```
 
-### Suggesting Enhancements
+### Suggesting Features
 
-Enhancement suggestions are tracked as GitHub issues. Include:
+Feature requests are welcome! Please provide:
+- Clear, descriptive title
+- Detailed description of the feature
+- Use case and benefits
+- Possible implementation approach (optional)
 
-- **Clear title and description**
-- **Use case** for the enhancement
-- **Proposed solution**
-- **Alternative solutions** considered
+### Code Contributions
 
-### Pull Requests
+1. **Find an issue** or create one
+2. **Comment** on the issue to let others know you're working on it
+3. **Fork and create a branch** for your work
+4. **Make your changes** following our coding standards
+5. **Test your changes** thoroughly
+6. **Submit a pull request**
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Write/update tests
-5. Ensure tests pass
-6. Update documentation
-7. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-8. Push to the branch (`git push origin feature/amazing-feature`)
-9. Open a Pull Request
+## 🔄 Development Workflow
 
-**Pull Request Template**:
+### 1. Keep Your Fork Updated
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
+### 2. Create a Feature Branch
+
+```bash
+git checkout -b feature/amazing-feature
+# or
+git checkout -b fix/bug-description
+# or
+git checkout -b docs/documentation-improvement
+```
+
+Branch naming conventions:
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation changes
+- `refactor/` - Code refactoring
+- `test/` - Adding or updating tests
+- `chore/` - Maintenance tasks
+
+### 3. Make Your Changes
+
+- Write clean, readable code
+- Follow the coding standards below
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass
+
+### 4. Test Your Changes
+
+**Backend:**
+```bash
+cd backend
+pytest tests/ -v
+pytest --cov=app tests/  # Check coverage
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm test
+npm run lint
+```
+
+### 5. Commit Your Changes
+
+```bash
+git add .
+git commit -m "feat: add amazing feature"
+```
+
+See [Commit Guidelines](#commit-guidelines) below.
+
+### 6. Push to Your Fork
+
+```bash
+git push origin feature/amazing-feature
+```
+
+### 7. Submit a Pull Request
+
+- Go to your fork on GitHub
+- Click "New Pull Request"
+- Select your feature branch
+- Fill out the PR template
+- Submit!
+
+## 📝 Coding Standards
+
+### Python (Backend)
+
+**Follow PEP 8**
+```bash
+# Use Black for formatting
+black app/
+
+# Use isort for imports
+isort app/
+
+# Use flake8 for linting
+flake8 app/
+```
+
+**Code Style:**
+```python
+# Good
+def analyze_email(email_text: str) -> dict:
+    """
+    Analyze email for spam detection.
+    
+    Args:
+        email_text: The email content to analyze
+        
+    Returns:
+        Dictionary with classification results
+    """
+    # Implementation
+    pass
+
+# Bad
+def analyzeEmail(emailText):
+    # No docstring, no type hints
+    pass
+```
+
+**Naming Conventions:**
+- Functions/variables: `snake_case`
+- Classes: `PascalCase`
+- Constants: `UPPER_SNAKE_CASE`
+- Private methods: `_leading_underscore`
+
+### JavaScript/React (Frontend)
+
+**Use ESLint and Prettier**
+```bash
+npm run lint
+npm run format
+```
+
+**Code Style:**
+```javascript
+// Good
+const EmailAnalyzer = ({ email, onAnalyze }) => {
+  const [loading, setLoading] = useState(false);
+  
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      await onAnalyze(email);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return <button onClick={handleSubmit}>Analyze</button>;
+};
+
+// Bad
+function emailAnalyzer(props) {
+  var loading = false;
+  // Missing error handling, inconsistent style
+}
+```
+
+**Naming Conventions:**
+- Components: `PascalCase`
+- Functions/variables: `camelCase`
+- Constants: `UPPER_SNAKE_CASE`
+- CSS classes: `kebab-case` (Tailwind utilities)
+
+### General Principles
+
+- **DRY**: Don't Repeat Yourself
+- **KISS**: Keep It Simple, Stupid
+- **YAGNI**: You Aren't Gonna Need It
+- Write self-documenting code
+- Add comments for complex logic
+- Keep functions small and focused
+- Use meaningful variable names
+
+## 📋 Commit Guidelines
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+### Commit Message Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, no code change)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks, dependencies
+
+### Examples
+
+```bash
+# Feature
+git commit -m "feat(auth): add password reset functionality"
+
+# Bug fix
+git commit -m "fix(api): resolve CORS issue in production"
+
+# Documentation
+git commit -m "docs(readme): update installation instructions"
+
+# Breaking change
+git commit -m "feat(api)!: change authentication endpoint structure
+
+BREAKING CHANGE: /auth/login now requires email instead of username"
+```
+
+## 🔍 Pull Request Process
+
+### Before Submitting
+
+- [ ] Code follows style guidelines
+- [ ] All tests pass
+- [ ] New tests added for new features
+- [ ] Documentation updated
+- [ ] Self-review completed
+- [ ] No unnecessary console.logs or debugging code
+- [ ] Commits are meaningful and follow guidelines
+
+### PR Template
+
 ```markdown
 ## Description
 Brief description of changes
@@ -83,85 +372,63 @@ Brief description of changes
 - [ ] Documentation update
 
 ## Testing
-- [ ] Tests added/updated
-- [ ] All tests passing
-- [ ] Manual testing completed
+Describe how you tested your changes
 
 ## Checklist
 - [ ] Code follows style guidelines
-- [ ] Self-review completed
-- [ ] Comments added for complex code
-- [ ] Documentation updated
-- [ ] No new warnings generated
+- [ ] Self-reviewed my code
+- [ ] Commented complex code
+- [ ] Updated documentation
+- [ ] No new warnings
+- [ ] Added tests
+- [ ] All tests pass
+
+## Screenshots (if applicable)
+Add screenshots here
+
+## Related Issues
+Closes #123
 ```
 
----
+### Review Process
 
-## Development Process
+1. Maintainers will review your PR within 48 hours
+2. Address any requested changes
+3. Once approved, your PR will be merged
+4. Your contribution will be acknowledged in the changelog
 
-### Setting Up Development Environment
+## 🎯 Areas for Contribution
 
-See [Development Guide](docs/DEVELOPMENT.md) for detailed setup instructions.
+### Good First Issues
 
-### Coding Standards
+Look for issues tagged with:
+- `good first issue`
+- `help wanted`
+- `documentation`
 
-- **Python**: Follow PEP 8, use Black formatter
-- **JavaScript**: Follow Airbnb style guide, use Prettier
-- **Commits**: Follow Conventional Commits specification
+### Current Priorities
 
-### Testing Requirements
+- Improving test coverage
+- Adding integration tests
+- Enhancing documentation
+- Performance optimizations
+- UI/UX improvements
 
-- All new features must include tests
-- Maintain minimum 80% code coverage
-- All tests must pass before PR approval
+## 💡 Need Help?
 
-### Documentation Requirements
+- 📧 Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
+- 💬 GitHub Issues: [Create an issue](https://github.com/Markjohns1/mailsentra/issues)
+- 📖 Documentation: [docs/](../docs/)
 
-- Update relevant documentation
-- Add docstrings for new functions/classes
-- Update API documentation for new endpoints
-- Add inline comments for complex logic
+## 🙏 Recognition
 
----
+All contributors will be recognized in:
+- README.md contributors section
+- CHANGELOG.md for each release
+- GitHub contributors page
 
-## Review Process
-
-1. **Automated Checks**: CI/CD pipeline runs tests and linting
-2. **Code Review**: At least one maintainer reviews code
-3. **Feedback**: Address review comments
-4. **Approval**: Maintainer approves and merges
-
-### Review Criteria
-
-- Code quality and readability
-- Test coverage
-- Documentation completeness
-- Performance impact
-- Security considerations
+Thank you for contributing to MailSentra! 🎉
 
 ---
 
-## Community
-
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: Questions and general discussions
-- **Email**: For security issues, email security@mailsentra.com
-
----
-
-## Recognition
-
-Contributors will be recognized in:
-- CONTRIBUTORS.md file
-- Release notes
-- Project README
-
----
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
----
-
-Thank you for contributing to MailSentra! ðŸŽ‰
+**Questions?** Feel free to ask in the issues or reach out directly!
