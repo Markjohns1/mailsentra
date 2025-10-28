@@ -1,26 +1,21 @@
-﻿# MailSentra
+# MailSentra
 
-<div align="center">
+![Python](https://img.shields.io/badge/python-3.13-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688.svg)
+![React](https://img.shields.io/badge/React-18.2.0-61dafb.svg)
+![Node](https://img.shields.io/badge/node-22.21.0-339933.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Status](https://img.shields.io/badge/status-active-success.svg)
 
 **Enterprise-Grade Email Spam Detection Platform**
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/yourusername/mailsentra)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
-[![React](https://img.shields.io/badge/react-18.2+-61DAFB.svg)](https://reactjs.org/)
-
-[Features](#features) â€¢ [Quick Start](#quick-start) â€¢ [Documentation](docs/) â€¢ [API Reference](docs/API.md) â€¢ [Contributing](CONTRIBUTING.md)
-
-</div>
+[Features](#features) • [Quick Start](#quick-start) • [Documentation](docs/) • [API Reference](docs/API.md) • [Contributing](CONTRIBUTING.md)
 
 ---
 
-## Overview
-
 MailSentra is a production-ready, full-stack email spam detection system powered by machine learning. It combines advanced NLP techniques with a modern web interface to provide real-time spam classification, continuous learning through user feedback, and comprehensive analytics.
 
-### Key Capabilities
+## ✨ Key Features
 
 - **Real-time Classification**: Analyze emails instantly with 95%+ accuracy
 - **Adaptive Learning**: Model improves continuously from user feedback
@@ -29,145 +24,237 @@ MailSentra is a production-ready, full-stack email spam detection system powered
 - **Analytics Dashboard**: Real-time metrics and performance monitoring
 - **API-First Design**: RESTful API with comprehensive OpenAPI documentation
 
-## Architecture
+## 🏗️ Architecture
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  React Client   â”‚â—„â”€â”€â”€â”€â–ºâ”‚   FastAPI Server â”‚â—„â”€â”€â”€â”€â–ºâ”‚   PostgreSQL    â”‚
-â”‚  (Frontend)     â”‚      â”‚    (Backend)     â”‚      â”‚   (Database)    â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                 â”‚
-                                 â–¼
-                         â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                         â”‚   ML Pipeline    â”‚
-                         â”‚  (Scikit-learn)  â”‚
-                         â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│ React Client │◄───►│FastAPI Server│◄───►│  PostgreSQL  │
+│  (Frontend)  │     │   (Backend)  │     │  (Database)  │
+└──────────────┘     └──────┬───────┘     └──────────────┘
+                            │
+                            ▼
+                     ┌──────────────┐
+                     │  ML Pipeline │
+                     │(Scikit-learn)│
+                     └──────────────┘
 ```
 
-## Features
+## 📊 Features Status
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **Spam Detection** | ML-powered email classification | âœ… Production |
-| **User Management** | Registration, authentication, profiles | âœ… Production |
-| **Analysis History** | Searchable log with filtering | âœ… Production |
-| **Feedback Loop** | User corrections for model improvement | âœ… Production |
-| **Model Retraining** | Admin-controlled retraining pipeline | âœ… Production |
-| **Analytics** | System metrics and performance tracking | âœ… Production |
-| **Rate Limiting** | API protection and abuse prevention | âœ… Production |
-| **Audit Logging** | Comprehensive activity tracking | âœ… Production |
+| **Spam Detection** | ML-powered email classification | ✅ Production |
+| **User Management** | Registration, authentication, profiles | ✅ Production |
+| **Analysis History** | Searchable log with filtering | ✅ Production |
+| **Feedback Loop** | User corrections for model improvement | ✅ Production |
+| **Model Retraining** | Admin-controlled retraining pipeline | ✅ Production |
+| **Analytics** | System metrics and performance tracking | ✅ Production |
+| **Rate Limiting** | API protection and abuse prevention | ✅ Production |
+| **Audit Logging** | Comprehensive activity tracking | ✅ Production |
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Python 3.13+
-- Node.js 18+
-- PostgreSQL 14+ (or SQLite for development)
+- Node.js 22.21.0+
+- PostgreSQL 14+ (production) or SQLite (development)
 - Git
 
 ### Installation
 
+#### 1. Clone the repository
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/mailsentra.git
+git clone https://github.com/Markjohns1/mailsentra.git
 cd mailsentra
+```
 
-# Backend setup
+#### 2. Backend Setup
+```bash
 cd backend
+
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env
-alembic upgrade head
-python train_model.py
-uvicorn main:app --reload
 
-# Frontend setup (new terminal)
-cd frontend
-npm install
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment
 cp .env.example .env
+# Edit .env with your settings
+
+# Run database migrations
+alembic upgrade head
+
+# Train the ML model
+python train_model.py
+
+# Start the backend server
+uvicorn main:app --reload
+```
+
+#### 3. Frontend Setup
+```bash
+# Open a new terminal
+cd frontend
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# Start the development server
 npm run dev
 ```
 
-Access the application:
-- **Frontend**: http://localhost:5173
-- **API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
+### Access the Application
 
-## Documentation
+- **Frontend**: [http://localhost:5173](http://localhost:5173)
+- **Backend API**: [http://localhost:8000](http://localhost:8000)
+- **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Alternative API Docs**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+## 📸 Screenshots
+
+> **Note**: Screenshots will be added soon. Check back for visual previews of the dashboard, analysis interface, and analytics pages.
+
+## 📚 Documentation
 
 | Document | Description |
 |----------|-------------|
-| [API Reference](docs/API.md) | Complete API documentation |
-| [Architecture](docs/ARCHITECTURE.md) | System design and components |
-| [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment |
-| [Development Guide](docs/DEVELOPMENT.md) | Developer setup and workflows |
+| [Architecture](docs/ARCHITECTURE.md) | System design and component interactions |
+| [API Reference](docs/API.md) | Complete API endpoint documentation |
+| [Development Guide](docs/DEVELOPMENT.md) | Setup and development workflows |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment instructions |
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Backend
-```
-FastAPI          - Modern web framework
-SQLAlchemy       - Database ORM
-Alembic          - Database migrations
-Scikit-learn     - Machine learning
-NLTK             - Natural language processing
-BeautifulSoup4   - HTML parsing
-Passlib          - Password hashing
-PyJWT            - JWT authentication
-SlowAPI          - Rate limiting
-```
+- **FastAPI 0.104.1** - Modern, fast web framework
+- **SQLAlchemy** - Database ORM
+- **Alembic** - Database migrations
+- **Scikit-learn** - Machine learning
+- **NLTK** - Natural language processing
+- **BeautifulSoup4** - HTML parsing
+- **Passlib** - Password hashing
+- **PyJWT** - JWT authentication
+- **SlowAPI** - Rate limiting
 
 ### Frontend
-```
-React 18         - UI framework
-Vite             - Build tool
-React Router     - Navigation
-Axios            - HTTP client
-Tailwind CSS     - Styling
-Recharts         - Data visualization
-Lucide React     - Icons
-```
+- **React 18.2.0** - UI framework
+- **Vite** - Build tool and dev server
+- **React Router** - Navigation
+- **Axios** - HTTP client
+- **Tailwind CSS** - Utility-first styling
+- **Recharts** - Data visualization
+- **Lucide React** - Icon library
 
-## Project Structure
+### Database
+- **SQLite** - Development environment
+- **PostgreSQL** - Production deployment
+
+## 📁 Project Structure
 
 ```
 mailsentra/
-â”œâ”€â”€ backend/
-â”‚   â”œâ”€â”€ alembic/              # Database migrations
-â”‚   â”œâ”€â”€ app/
-â”‚   â”‚   â”œâ”€â”€ models/           # Database models
-â”‚   â”‚   â”œâ”€â”€ routes/           # API endpoints
-â”‚   â”‚   â”œâ”€â”€ services/         # Business logic
-â”‚   â”‚   â””â”€â”€ utils/            # Utilities
-â”‚   â”œâ”€â”€ dataset/              # Training data
-â”‚   â”œâ”€â”€ ml_models/            # Trained models
-â”‚   â””â”€â”€ tests/                # Unit tests
-â”œâ”€â”€ frontend/
-â”‚   â””â”€â”€ src/
-â”‚       â”œâ”€â”€ components/       # React components
-â”‚       â”œâ”€â”€ context/          # State management
-â”‚       â”œâ”€â”€ pages/            # Page components
-â”‚       â””â”€â”€ services/         # API services
-â”œâ”€â”€ docs/                     # Documentation
-â””â”€â”€ README.md
+├── backend/
+│   ├── alembic/              # Database migrations
+│   ├── app/
+│   │   ├── models/           # Database models
+│   │   ├── routes/           # API endpoints
+│   │   ├── services/         # Business logic
+│   │   └── utils/            # Utilities
+│   ├── dataset/              # Training data
+│   ├── ml_models/            # Trained models
+│   ├── tests/                # Unit tests
+│   ├── main.py               # Application entry point
+│   └── requirements.txt      # Python dependencies
+├── frontend/
+│   └── src/
+│       ├── components/       # React components
+│       ├── context/          # State management
+│       ├── pages/            # Page components
+│       └── services/         # API services
+├── docs/                     # Documentation
+├── README.md                 # This file
+├── CONTRIBUTING.md           # Contribution guidelines
+└── LICENSE                   # MIT License
 ```
 
-## License
+## 🧪 Testing
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+```bash
+# Backend tests
+cd backend
+pytest tests/ -v
 
-## Support
+# Frontend tests
+cd frontend
+npm test
 
-- ðŸ“§ Email: support@mailsentra.com
-- ðŸ’¬ Issues: [GitHub Issues](https://github.com/yourusername/mailsentra/issues)
-- ðŸ“– Docs: [Documentation](docs/)
+# Coverage report
+pytest --cov=app tests/
+```
+
+## 🐳 Docker Deployment
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+- Code of Conduct
+- Development process
+- Submitting pull requests
+- Coding standards
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**John O. Mark** - Founder & Lead Developer
+
+- Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
+- GitHub: [@Markjohns1](https://github.com/Markjohns1)
+
+## 📞 Support
+
+- 📧 Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
+- 🐛 Issues: [GitHub Issues](https://github.com/Markjohns1/mailsentra/issues)
+- 📖 Documentation: [docs/](docs/)
+
+## 🙏 Acknowledgments
+
+- SMS Spam Collection Dataset
+- FastAPI and React communities
+- All contributors and supporters
+
+## 📈 Project Roadmap
+
+- [ ] Mobile application (iOS/Android)
+- [ ] Browser extension
+- [ ] Multi-language support
+- [ ] Advanced analytics with AI insights
+- [ ] Integration with email providers (Gmail, Outlook)
+- [ ] Batch email processing
+- [ ] Custom model training for enterprises
 
 ---
 
-<div align="center">
+**Made with ❤️ by John O. Mark**
 
-Made with â¤ï¸ by the MailSentra Team
-
-</div>
+*Version 1.0.0 - Last updated: October 2024*
