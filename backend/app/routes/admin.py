@@ -8,14 +8,14 @@ from pydantic import BaseModel, EmailStr
 from app.database import get_db
 from app.models.user import User
 from app.models.spam_log import SpamLog
-from app.models.feedback import UserFeedback
+from app.models.use_feedback import UserFeedback
 from app.models.api_key import APIKey
 from app.models.email import Email
 from app.dependencies import get_current_admin_user
 
 router = APIRouter()
 
-# ============= SCHEMAS =============
+#  SCHEMAS 
 class UserUpdateSchema(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
@@ -27,7 +27,7 @@ class APIKeyCreateSchema(BaseModel):
     name: str
     expires_in_days: Optional[int] = None
 
-# ============= USER MANAGEMENT =============
+#  USER MANAGEMENT 
 @router.get("/users")
 def get_all_users(
     skip: int = Query(0, ge=0),
@@ -69,6 +69,79 @@ def get_all_users(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get users: {str(e)}"
+        )
+
+
+# ADD THIS TO app/routes/admin.py after the get_all_users function
+
+class UserCreateSchema(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+    is_active: bool = True
+    is_admin: bool = False
+
+@router.post("/users/create")
+def create_user(
+    user_data: UserCreateSchema,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new user (admin only)"""
+    try:
+        existing_username = db.query(User).filter(User.username == user_data.username).first()
+        if existing_username:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already exists"
+            )
+        
+        existing_email = db.query(User).filter(User.email == user_data.email).first()
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already exists"
+            )
+        
+        if len(user_data.password) < 8:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password must be at least 8 characters"
+            )
+        
+        from app.utils.security import get_password_hash
+        
+        new_user = User(
+            username=user_data.username,
+            email=user_data.email,
+            hashed_password=get_password_hash(user_data.password),
+            is_active=user_data.is_active,
+            is_admin=user_data.is_admin
+        )
+        
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        return {
+            "message": "User created successfully",
+            "user": {
+                "id": new_user.id,
+                "username": new_user.username,
+                "email": new_user.email,
+                "is_active": new_user.is_active,
+                "is_admin": new_user.is_admin,
+                "created_at": new_user.created_at
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create user: {str(e)}"
         )
 
 @router.get("/users/{user_id}")
@@ -220,7 +293,7 @@ def delete_user(
             detail=f"Failed to delete user: {str(e)}"
         )
 
-# ============= SYSTEM ANALYTICS =============
+#  SYSTEM ANALYTICS 
 @router.get("/stats")
 def get_system_stats(
     current_user: User = Depends(get_current_admin_user),
@@ -355,7 +428,7 @@ def get_spam_trends(
             detail=f"Failed to get spam trends: {str(e)}"
         )
 
-# ============= SPAM MANAGEMENT =============
+#  SPAM MANAGEMENT 
 @router.get("/spam-logs")
 def get_all_spam_logs(
     skip: int = Query(0, ge=0),
@@ -445,7 +518,7 @@ def get_all_feedback(
             detail=f"Failed to get feedback: {str(e)}"
         )
 
-# ============= API KEY MANAGEMENT =============
+#  API KEY MANAGEMENT 
 @router.get("/api-keys")
 def get_all_api_keys(
     user_id: Optional[int] = None,
@@ -605,7 +678,7 @@ def toggle_api_key_active(
             detail=f"Failed to toggle API key status: {str(e)}"
         )
 
-# ============= MODEL MANAGEMENT =============
+#  MODEL MANAGEMENT 
 @router.get("/model/info")
 def get_model_info(
     current_user: User = Depends(get_current_admin_user),
@@ -743,7 +816,7 @@ def get_model_performance(
             detail=f"Failed to get model performance: {str(e)}"
         )
 
-# ============= SYSTEM HEALTH =============
+#  SYSTEM HEALTH 
 @router.get("/health")
 def get_system_health(
     current_user: User = Depends(get_current_admin_user),
@@ -793,7 +866,7 @@ def get_system_health(
             "timestamp": datetime.utcnow().isoformat()
         }
 
-# ============= BULK OPERATIONS =============
+#  BULK OPERATIONS 
 @router.post("/bulk/deactivate-inactive-users")
 def deactivate_inactive_users(
     days_inactive: int = Query(90, ge=1),
@@ -871,7 +944,7 @@ def delete_old_logs(
             detail=f"Failed to delete old logs: {str(e)}"
         )
 
-# ============= EXPORT DATA =============
+#  EXPORT DATA 
 @router.get("/export/users")
 def export_users_data(
     current_user: User = Depends(get_current_admin_user),

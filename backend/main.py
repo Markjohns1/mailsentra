@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
@@ -8,15 +8,10 @@ from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from app.routes import admin
-
-from app.routes import admin
-
-
+from app.services.model_service import spam_model
 
 limiter = Limiter(key_func=get_remote_address)
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -27,10 +22,17 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     logger.info("Starting up Spam Detection API...")
-    # TODO: Load ML model here
+    
+    if not spam_model.is_loaded:
+        logger.warning("⚠️ Model not loaded! Run 'python train_model.py' first")
+    else:
+        logger.info("✅ Spam detection model ready")
+        logger.info(f"   - Version: {spam_model.metadata.get('version', 'unknown')}")
+        logger.info(f"   - Accuracy: {spam_model.metadata.get('accuracy', 0) * 100:.2f}%")
+    
     yield
+    
     logger.info("Shutting down Spam Detection API...")
-    # TODO: Cleanup resources
 
 app = FastAPI(
     title="Spam Detection API",
@@ -41,14 +43,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
-# Initialize rate limiter
 app.state.limiter = limiter
-
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    """Handle rate limit exceeded errors."""
+    """Handle rate limit exceeded errors"""
     return JSONResponse(
         status_code=429,
         content={
@@ -58,7 +57,6 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         headers={"Retry-After": str(exc.retry_after)}
     )
 
-# CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -72,7 +70,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/user", tags=["User"])
 app.include_router(preprocessing.router, prefix="/api/preprocessing", tags=["Preprocessing"])

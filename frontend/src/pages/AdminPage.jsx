@@ -213,20 +213,30 @@ export default function AdminPage() {
   }
 
   const saveEditUser = async () => {
-    try {
+  try {
+    if (editingUser === 'new') {
+      const res = await fetch(`${API_BASE_URL}/admin/users/create`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(editForm)
+      })
+      if (!res.ok) throw new Error('Failed to create user')
+      showSuccess?.('User created')
+    } else {
       const res = await fetch(`${API_BASE_URL}/admin/users/${editingUser}`, {
         method: 'PATCH',
         headers: getHeaders(),
         body: JSON.stringify(editForm)
       })
-      if (!res.ok) throw new Error('Failed to update')
+      if (!res.ok) throw new Error('Failed to update user')
       showSuccess?.('User updated')
-      setEditingUser(null)
-      loadUsers()
-    } catch (e) {
-      showError?.(String(e))
     }
+    setEditingUser(null)
+    loadUsers()
+  } catch (e) {
+    showError?.(String(e))
   }
+}
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -362,7 +372,7 @@ const tabs = [
             <div className="space-y-6">
               {editingUser ? (
                 <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">Edit User</h3>
+                  <h3 className="text-xl font-bold text-white mb-4">{editingUser === 'new' ? 'Create User' : 'Edit User'}</h3>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-300 mb-2">Username</label>
@@ -382,6 +392,17 @@ const tabs = [
                         className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
                       />
                     </div>
+                    {editingUser === 'new' && (
+  <div>
+    <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+    <input
+      type="password"
+      value={editForm.password || ''}
+      onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+      className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
+    />
+  </div>
+)}
                     <div className="flex gap-6">
                       <label className="flex items-center gap-2 text-slate-300">
                         <input type="checkbox" checked={editForm.is_active} onChange={(e) => setEditForm({...editForm, is_active: e.target.checked})} className="w-4 h-4 rounded" />
@@ -406,6 +427,16 @@ const tabs = [
                 <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
                   <div className="px-6 py-4 border-b border-slate-700 flex justify-between">
                     <h2 className="text-xl font-bold text-white">Users ({users.length})</h2>
+                    <button 
+
+                      onClick={() => {
+      setEditingUser('new')
+      setEditForm({ username: '', email: '', password: '', is_active: true, is_admin: false })
+    }}
+    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition"
+  >
+    Add User
+  </button>
                   </div>
                   {loading ? (
                     <div className="p-8 text-center">
@@ -420,6 +451,7 @@ const tabs = [
                             <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Username</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Email</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Role</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Actions</th>
                           </tr>
                         </thead>
@@ -434,6 +466,18 @@ const tabs = [
                                   {u.is_active ? 'Active' : 'Inactive'}
                                 </span>
                               </td>
+  <td className="px-6 py-4">
+  <span
+    className={`px-3 py-1 text-xs rounded ${
+      u.is_admin
+        ? "bg-blue-500/20 text-blue-400"
+        : "bg-slate-500/20 text-slate-400"
+    }`}
+  >
+    {u.is_admin ? "Admin" : "User"}
+  </span>
+</td>
+
                               <td className="px-6 py-4 text-sm flex gap-2">
                                 <button onClick={() => openEditUser(u)} title="Edit" className="p-2 hover:bg-slate-700 rounded text-blue-400 hover:text-blue-300">
                                   <Edit2 size={16} />
