@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query 
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, and_
 from datetime import datetime, timedelta
@@ -10,8 +10,8 @@ from app.models.user import User
 from app.models.spam_log import SpamLog
 from app.models.use_feedback import UserFeedback
 from app.models.api_key import APIKey
-from app.models.email import Email
-from app.dependencies import get_current_admin_user
+from app.models.email import Email 
+from app.dependencies import get_current_admin_user  
 
 router = APIRouter()
 
@@ -28,7 +28,7 @@ class APIKeyCreateSchema(BaseModel):
     expires_in_days: Optional[int] = None
 
 #  USER MANAGEMENT 
-@router.get("/users")
+@router.get("/users") # get all users (admin only)  
 def get_all_users(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=500),
@@ -60,7 +60,7 @@ def get_all_users(
                     "email": user.email,
                     "is_active": user.is_active,
                     "is_admin": user.is_admin,
-                    "created_at": user.created_at
+                    "created_at": user.created_at # date and time the user was created in the database  
                 }
                 for user in users
             ]
@@ -72,7 +72,7 @@ def get_all_users(
         )
 
 
-# ADD THIS TO app/routes/admin.py after the get_all_users function
+
 
 class UserCreateSchema(BaseModel):
     username: str
@@ -81,105 +81,98 @@ class UserCreateSchema(BaseModel):
     is_active: bool = True
     is_admin: bool = False
 
-@router.post("/users/create")
-def create_user(
-    user_data: UserCreateSchema,
-    current_user: User = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+@router.post("/users/create") # create a new user (admin only) 
+def create_user( # create a new user (admin only) 
+    user_data: UserCreateSchema, # user data to create a new user (username, email, password, is_active, is_admin)  
+    current_user: User = Depends(get_current_admin_user), # current user (admin only) (dependency injection)  
+    db: Session = Depends(get_db) # database session to interact with the database (dependency injection)  
 ):
-    """Create a new user (admin only)"""
+    """Create a new user (admin only)""" 
     try:
-        existing_username = db.query(User).filter(User.username == user_data.username).first()
+        existing_username = db.query(User).filter(User.username == user_data.username).first() # check if the username already exists in the database   
         if existing_username:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Username already exists"
+                detail="Username already exists. Try another one"
             )
         
-        existing_email = db.query(User).filter(User.email == user_data.email).first()
+        existing_email = db.query(User).filter(User.email == user_data.email).first() # check if the email already exists in the database   
         if existing_email:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already exists"
+                detail="Email already exists. Use a unique email."
             )
         
         if len(user_data.password) < 8:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Password must be at least 8 characters"
+                detail="Password must be at least 8 characters. Try a stronger one."
             )
         
         from app.utils.security import get_password_hash
-        
+        # hash the password using the get_password_hash function from the security module    
         new_user = User(
-            username=user_data.username,
-            email=user_data.email,
+            username=user_data.username, 
+            email=user_data.email, 
             hashed_password=get_password_hash(user_data.password),
-            is_active=user_data.is_active,
-            is_admin=user_data.is_admin
+            is_active=user_data.is_active, # is the user active? (True or False)  
+            is_admin=user_data.is_admin, # is the user an admin? (True or False)  
         )
         
         db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
+        db.commit() # commit the new user to the database (save the new user to the database)  
+        db.refresh(new_user) # refresh the new user to get the latest data from the database TO THE USER OBJECT
         
         return {
-            "message": "User created successfully",
+            "message": "User created successfully", # message to the user that the user was created successfully  
             "user": {
-                "id": new_user.id,
-                "username": new_user.username,
-                "email": new_user.email,
-                "is_active": new_user.is_active,
-                "is_admin": new_user.is_admin,
-                "created_at": new_user.created_at
+                "id": new_user.id, # the id of the new user  
+                "username": new_user.username, # the username of the new user  
+                "email": new_user.email, # the email of the new user  
+                "is_active": new_user.is_active, # is the user active? (True or False)  
+                "is_admin": new_user.is_admin, # is the user an admin? (True or False)  
+                "created_at": new_user.created_at # date and time the user was created in the database  
             }
         }
         
-    except HTTPException:
-        raise
+    except HTTPException: # if an HTTP exception occurs, raise it  
+        raise # raise the HTTP exception  
     except Exception as e:
-        db.rollback()
+        db.rollback() # rollback the transaction if an exception occurs  
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create user: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, # status code 500 (internal server error)  
+            detail=f"Failed to create user: {str(e)}" # detail of the error  
         )
 
 @router.get("/users/{user_id}")
 def get_user_details(
     user_id: int,
-    current_user: User = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    current_user: User = Depends(get_current_admin_user), # current user (admin only) (dependency injection)  
+    db: Session = Depends(get_db) # database session to interact with the database (dependency injection)  
 ):
-    """Get detailed information about a specific user"""
+    """Get detailed information about a specific user""" # get detailed information about a specific user (admin only)  
     try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
+        user = db.query(User).filter(User.id == user_id).first() # get the user from the database by id  
+        if not user: 
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
         
         # Get user's spam logs count
-        total_scans = db.query(SpamLog).filter(SpamLog.user_id == user_id).count()
-        spam_detected = db.query(SpamLog).filter(
-            SpamLog.user_id == user_id,
-            SpamLog.result.ilike("%spam%")
-        ).count()
-        
-        # Get user's feedback count
-        total_feedback = db.query(UserFeedback).filter(UserFeedback.user_id == user_id).count()
-        
-        # Get user's API keys
-        api_keys = db.query(APIKey).filter(APIKey.user_id == user_id).all()
+        total_scans = db.query(SpamLog).filter(SpamLog.user_id == user_id).count() # get the total number of spam logs for the user by user id by counting the number of spam logs for the user by user id  
+        spam_detected = db.query(SpamLog).filter(SpamLog.user_id == user_id, SpamLog.result.ilike("%spam%")).count() # get the number of spam logs for the user by user id by counting the number of spam logs for the user by user id that contain the word "spam" in the result column  
+        total_feedback = db.query(UserFeedback).filter(UserFeedback.user_id == user_id).count() # get the total number of feedback for the user by user id by counting the number of feedback for the user by user id  
+        api_keys = db.query(APIKey).filter(APIKey.user_id == user_id).all() # get the API keys for the user by user id by getting all the API keys for the user by user id  
         
         return {
             "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "is_active": user.is_active,
-                "is_admin": user.is_admin,
-                "created_at": user.created_at
+                "id": user.id, # the id of the user  
+                "username": user.username, # the username of the user  
+                "email": user.email, # the email of the user  
+                "is_active": user.is_active, # is the user active? (True or False)  
+                "is_admin": user.is_admin, # is the user an admin? (True or False)  
+                "created_at": user.created_at # date and time the user was created in the database  
             },
             "activity": {
                 "total_scans": total_scans,
@@ -194,7 +187,7 @@ def get_user_details(
                     "is_active": key.is_active,
                     "created_at": key.created_at
                 }
-                for key in api_keys
+                for key in api_keys 
             ]
         }
     except HTTPException:
@@ -282,6 +275,8 @@ def delete_user(
         # Now delete the user
         db.delete(user)
         db.commit()
+        db.refresh(user) # refresh the user to get the latest data from the database TO THE USER OBJECT
+
         
         return {"message": f"User '{user.username}' deleted successfully"}
     except HTTPException:
@@ -331,9 +326,9 @@ def get_system_stats(
             "spam_percentage": round((spam_count / total_logs * 100), 2) if total_logs > 0 else 0
         }
     except Exception as e:
-        import traceback
-        print(f"ERROR in /stats: {str(e)}")
-        print(traceback.format_exc())
+        import traceback # traceback module to print the traceback of the error  
+        print(f"ERROR in /stats: {str(e)}") # print the error message  (e is the error message)  
+        print(traceback.format_exc()) # print the traceback of the error  (format_exc() is a function that formats the traceback of the error to a string) 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get statistics: {str(e)}"
@@ -391,7 +386,7 @@ def get_spam_trends(
 ):
     """Get spam detection trends over time"""
     try:
-        end_date = datetime.utcnow()
+        end_date = datetime.utcnow() # get the current date and time in the UTC timezone  (utcnow() is a function that returns the current date and time in the UTC timezone)  
         start_date = end_date - timedelta(days=days)
 
         trends_data = []
@@ -402,7 +397,7 @@ def get_spam_trends(
             day_logs = db.query(SpamLog).filter(
                 and_(
                     SpamLog.created_at >= day_start,
-                    SpamLog.created_at < day_end
+                    SpamLog.created_at < day_end # the date and time the spam log was created in the database is greater than the start date and less than the end date (SpamLog.created_at is the date and time the spam log was created in the database)  
                 )
             ).all()
 
@@ -481,7 +476,7 @@ def get_all_feedback(
     limit: int = Query(50, ge=1, le=500),
     misclassified_only: bool = Query(False),
     current_user: User = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db) 
 ):
     """View all user feedback"""
     try:
@@ -519,23 +514,23 @@ def get_all_feedback(
         )
 
 #  API KEY MANAGEMENT 
-@router.get("/api-keys")
-def get_all_api_keys(
+@router.get("/api-keys") # get all API keys (admin only) 
+def get_all_api_keys( 
     user_id: Optional[int] = None,
-    active_only: bool = Query(False),
+    active_only: bool = Query(False), 
     current_user: User = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db) 
 ):
-    """Get all API keys"""
+    """Get all API keys""" 
     try:
-        query = db.query(APIKey)
+        query = db.query(APIKey) 
 
-        if user_id:
-            query = query.filter(APIKey.user_id == user_id)
-        if active_only:
+        if user_id: 
+            query = query.filter(APIKey.user_id == user_id) 
+        if active_only:  
             query = query.filter(APIKey.is_active == True)
 
-        api_keys = query.all()
+        api_keys = query.all() #querry(this is a query object) is made to the database to get all the API keys from the database  
 
         return {
             "total": len(api_keys),

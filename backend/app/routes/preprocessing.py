@@ -11,8 +11,8 @@ class EmailContent(BaseModel):
 class PreprocessingResponse(BaseModel):
     original: str
     step1_html_removed: str
-    step2_lowercase: str
-    step3_symbols_removed: str
+    step2_lowercase: str 
+    step3_symbols_removed: str 
     step4_stopwords_removed: str
     step5_tokens: list
     final_processed_text: str
@@ -20,7 +20,7 @@ class PreprocessingResponse(BaseModel):
     original_length: int
     processed_length: int
 
-@router.post("/preprocess", response_model=PreprocessingResponse)
+@router.post("/preprocess", response_model=PreprocessingResponse) 
 def preprocess_email(email_data: EmailContent):
     """
     Preprocess email content through the cleaning pipeline

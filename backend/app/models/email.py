@@ -4,7 +4,7 @@ from app.database import Base
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-NAIROBI_TZ = ZoneInfo("Africa/Nairobi")
+NAIROBI_TZ = ZoneInfo("Africa/Nairobi") 
 
 def get_nairobi_time():
     """Get current time in Nairobi timezone"""
@@ -12,7 +12,7 @@ def get_nairobi_time():
 
 class Email(Base):
     """Email model for storing email content"""
-    __tablename__ = "emails"
+    __tablename__ = "emails" #__tablename__ is a special variable that holds the name of the table in the database. it is used to tell the database what table to use.
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)

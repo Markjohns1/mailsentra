@@ -13,12 +13,12 @@ from app.services.preprocessing import email_preprocessor
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class SpamDetectionModel:
+class SpamDetectionModel: # SpamDetectionModel is a class that handles the model loading and predictions
     """
     Spam detection model service
     Handles model loading and predictions
     """
-    
+    #how does this prediction work? it works by loading the model from the disk and then using the model to predict the spam or not spam by 
     def __init__(self, model_path: str = "ml_models/spam_model.pkl"):
         """
         Initialize the model service
@@ -57,7 +57,7 @@ class SpamDetectionModel:
             self.model = self.metadata['model']
             self.vectorizer = self.metadata['vectorizer']
             
-            logger.info(f"✅ Model loaded successfully!")
+            logger.info(f"Model loaded successfully!")
             logger.info(f"   - Version: {self.metadata.get('version', 'unknown')}")
             logger.info(f"   - Accuracy: {self.metadata.get('accuracy', 0) * 100:.2f}%")
             logger.info(f"   - Algorithm: {self.metadata.get('algorithm', 'unknown')}")
@@ -67,7 +67,7 @@ class SpamDetectionModel:
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error loading model: {e}")
+            logger.error(f" Error loading model: {e}")
             self.is_loaded = False
             return False
     
@@ -82,7 +82,7 @@ class SpamDetectionModel:
             Dictionary with prediction results
         """
         if not self.is_loaded:
-            logger.error("❌ Model not loaded. Cannot make predictions.")
+            logger.error(" Model not loaded. Cannot make predictions.")
             return {
                 "error": "Model not loaded",
                 "result": "unknown",
@@ -117,7 +117,7 @@ class SpamDetectionModel:
             # Determine result
             result = "spam" if prediction == "spam" else "ham"
             
-            logger.info(f"📧 Prediction: {result.upper()} (confidence: {confidence * 100:.2f}%)")
+            logger.info(f" Prediction: {result.upper()} (confidence: {confidence * 100:.2f}%)")
             
             return {
                 "result": result,
@@ -130,7 +130,7 @@ class SpamDetectionModel:
             }
             
         except Exception as e:
-            logger.error(f"❌ Prediction error: {e}")
+            logger.error(f" Prediction error: {e}")
             return {
                 "error": str(e),
                 "result": "unknown",
@@ -160,4 +160,4 @@ class SpamDetectionModel:
         }
 
 # Create global model instance
-spam_model = SpamDetectionModel()
+spam_model = SpamDetectionModel() # spam_model is a global model instance that is used to predict the spam or not spam by the SpamDetectionModel class.

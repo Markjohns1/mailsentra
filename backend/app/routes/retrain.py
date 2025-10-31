@@ -11,7 +11,7 @@ from app.database import get_db
 from app.models.spam_log import SpamLog
 from app.models.use_feedback import UserFeedback
 from app.dependencies import get_current_admin_user
-from app.models.user import User
+from app.models.user import User 
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -21,8 +21,8 @@ class RetrainResponse(BaseModel):
     success: bool
     training_stats: Dict[str, Any]
 
-class RetrainStatusResponse(BaseModel):
-    ready_to_retrain: bool
+class RetrainStatusResponse(BaseModel): 
+    ready_to_retrain: bool # is the model ready to retrain? (True or False)  . depends on the feedback count and the minimum(10) required feedback count
     feedback_count: int
     min_required: int
     message: str
@@ -79,7 +79,7 @@ def train_initial_model(
             training_stats={
                 "accuracy": spam_model.metadata.get('accuracy', 0),
                 "version": str(spam_model.metadata.get('version', 'unknown')),
-                "training_samples": 5574,
+                "training_samples": 5574, # 5574 is gotten from the dataset/SMSSpamCollection file in the dataset folder in the backend(spam-detection-api) directory
                 "trained_at": datetime.now().isoformat(),
                 "retrained": False
             }
@@ -141,7 +141,7 @@ def retrain_model(
         accuracy, version = train_model_from_data(training_data)
 
         from app.services.model_service import spam_model
-        spam_model.load_model()
+        spam_model.load_model() 
 
         logger.info(f"Model v{version} retrained successfully. New accuracy: {accuracy * 100:.2f}%")
 
@@ -164,5 +164,5 @@ def retrain_model(
         logger.error(f"Retraining failed: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Retraining failed: {str(e)}"
+            detail=f"Retraining failed: {str(e)}" 
         )

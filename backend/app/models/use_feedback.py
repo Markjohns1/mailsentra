@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text 
 from sqlalchemy.orm import relationship
-from app.database import Base
+from app.database import Base # Base is like a base class for all the models. it is used to inherit things like the id, primary key, index, nullable, etc. from.
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -22,7 +22,7 @@ class UserFeedback(Base):
     comment = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=get_nairobi_time)
     
-    # Relationships
+    # Relationships (this is a relationship between the UserFeedback model and the User model and the SpamLog model)
     user = relationship("User", back_populates="feedbacks")
     spam_log = relationship("SpamLog", back_populates="feedbacks")
     
