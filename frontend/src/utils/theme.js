@@ -1,0 +1,68 @@
+export const theme = {
+  colors: {
+    primary: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6',
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+    },
+    slate: {
+      50: '#f8fafc',
+      100: '#f1f5f9',
+      200: '#e2e8f0',
+      300: '#cbd5e1',
+      400: '#94a3b8',
+      500: '#64748b',
+      600: '#475569',
+      700: '#334155',
+      800: '#1e293b',
+      900: '#0f172a',
+      950: '#020617',
+    },
+    success: {
+      light: '#10b981',
+      DEFAULT: '#059669',
+      dark: '#047857',
+    },
+    danger: {
+      light: '#ef4444',
+      DEFAULT: '#dc2626',
+      dark: '#b91c1c',
+    },
+    warning: {
+      light: '#f59e0b',
+      DEFAULT: '#d97706',
+      dark: '#b45309',
+    },
+  },
+  gradients: {
+    primary: 'bg-gradient-to-br from-slate-900 to-slate-800',
+    card: 'bg-gradient-to-br from-slate-800 to-slate-900',
+    blue: 'bg-gradient-to-br from-blue-600 to-blue-700',
+    green: 'bg-gradient-to-br from-green-600 to-green-700',
+    red: 'bg-gradient-to-br from-red-600 to-red-700',
+    purple: 'bg-gradient-to-br from-purple-600 to-purple-700',
+    yellow: 'bg-gradient-to-br from-yellow-600 to-yellow-700',
+  },
+  spacing: {
+    page: 'p-6 md:p-8',
+    card: 'p-4 md:p-6',
+    section: 'space-y-6',
+  },
+  borders: {
+    card: 'border border-slate-700 rounded-xl',
+    input: 'border border-slate-600 rounded-lg',
+  },
+  text: {
+    heading: 'text-white font-bold',
+    subheading: 'text-slate-300',
+    body: 'text-slate-400',
+    muted: 'text-slate-500',
+  },
+}
