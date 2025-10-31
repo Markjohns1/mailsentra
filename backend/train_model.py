@@ -223,6 +223,7 @@ def save_model(model, vectorizer, accuracy, version=None, retrained=False):
 def train_model_from_data(training_data, test_size=0.2):
     """
     Train model from custom training data (for retraining from feedback)
+    Combines feedback samples with original dataset to prevent catastrophic forgetting
     
     Args:
         training_data: List of dicts with 'text' and 'label' keys
@@ -234,20 +235,103 @@ def train_model_from_data(training_data, test_size=0.2):
     logger.info(f"🔄 Retraining model with {len(training_data)} feedback samples...")
 
     try:
-        # Convert to DataFrame
-        df = pd.DataFrame(training_data)
+        # Validate feedback data
+        feedback_df = pd.DataFrame(training_data)
         
-        # Preprocess
-        logger.info("📝 Preprocessing feedback samples...")
+        # Validate labels
+        valid_labels = {'spam', 'ham', 'not spam'}
+        feedback_df['label'] = feedback_df['label'].str.lower().str.strip()
+        feedback_df['label'] = feedback_df['label'].replace('not spam', 'ham')
+        
+        invalid_labels = set(feedback_df['label'].unique()) - valid_labels
+        if invalid_labels:
+            raise ValueError(f"Invalid labels found: {invalid_labels}. Must be 'spam' or 'ham'")
+        
+        # Log class distribution
+        logger.info("📊 Feedback class distribution:")
+        for label, count in feedback_df['label'].value_counts().items():
+            logger.info(f"   - {label}: {count} samples")
+        
+        # Load original dataset to combine with feedback
+        logger.info("📂 Loading original dataset to prevent catastrophic forgetting...")
+        try:
+            dataset_path = "dataset/SMSSpamCollection"
+            if not Path(dataset_path).exists():
+                logger.warning("⚠️  Original dataset not found, downloading...")
+                dataset_path = download_dataset()
+            
+            base_df = load_dataset(dataset_path)
+            logger.info(f"✅ Loaded {len(base_df)} samples from base dataset")
+            
+            # Rename column to match feedback format
+            base_df = base_df.rename(columns={'message': 'text'})
+            
+            # Combine base dataset with feedback
+            combined_df = pd.concat([base_df, feedback_df[['text', 'label']]], ignore_index=True)
+            logger.info(f"📊 Combined dataset: {len(combined_df)} total samples")
+            logger.info(f"   - Base: {len(base_df)}, Feedback: {len(feedback_df)}")
+            
+        except Exception as e:
+            logger.warning(f"⚠️  Could not load base dataset: {e}")
+            logger.warning("⚠️  Training only on feedback (risk of catastrophic forgetting)")
+            combined_df = feedback_df
+        
+        # Log final class distribution
+        logger.info("📊 Final training class distribution:")
+        for label, count in combined_df['label'].value_counts().items():
+            logger.info(f"   - {label}: {count} samples")
+        
+        # Check for class imbalance that could cause stratify errors
+        min_class_samples = combined_df['label'].value_counts().min()
+        if min_class_samples < 2:
+            logger.warning(f"⚠️  Minimum class has only {min_class_samples} sample(s)")
+            logger.warning("⚠️  Disabling stratification to prevent errors")
+            use_stratify = False
+        else:
+            use_stratify = True
+        
+        # Preprocess combined data
+        logger.info("📝 Preprocessing combined dataset...")
         processed_messages = []
-        for message in df['text']:
+        for message in combined_df['text']:
             result = email_preprocessor.preprocess_email(message, return_steps=False)
             processed_messages.append(result['final_processed_text'])
         
-        df['processed_message'] = processed_messages
+        combined_df['processed_message'] = processed_messages
         
-        # Train model
-        model, vectorizer, accuracy = train_model(df, test_size=test_size)
+        # Train model with appropriate stratification
+        X = combined_df['processed_message']
+        y = combined_df['label']
+        
+        # Split with or without stratification based on class balance
+        if use_stratify:
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=test_size, random_state=42, stratify=y
+            )
+        else:
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=test_size, random_state=42
+            )
+        
+        logger.info(f"   - Training samples: {len(X_train)}")
+        logger.info(f"   - Testing samples: {len(X_test)}")
+        
+        # Train the model
+        vectorizer = CountVectorizer(max_features=3000)
+        X_train_vec = vectorizer.fit_transform(X_train)
+        X_test_vec = vectorizer.transform(X_test)
+        
+        model = MultinomialNB()
+        model.fit(X_train_vec, y_train)
+        
+        # Evaluate
+        y_pred = model.predict(X_test_vec)
+        accuracy = accuracy_score(y_test, y_pred)
+        
+        logger.info(f"✅ Model retrained successfully!")
+        logger.info(f"   - Accuracy: {accuracy * 100:.2f}%")
+        logger.info("\n📊 Classification Report:")
+        print(classification_report(y_test, y_pred))
         
         # Save with new version
         model_path, version = save_model(model, vectorizer, accuracy, retrained=True)

@@ -79,7 +79,25 @@ The deployment is configured to run in VM mode:
 - Frontend is built as static files
 
 ## Recent Changes
-- **2024-10-31**: Initial Replit setup
+
+### October 31, 2025 - UI Redesign & ML Fixes
+- **Complete UI Transformation**: 
+  - Implemented unified professional dark theme (slate-900/800 backgrounds with blue-600 accents)
+  - Redesigned Login/Register pages with gradient cards and modern icons
+  - Redesigned Dashboard with gradient stat cards and responsive layout
+  - Updated all components (Navbar, StatsCard, AnalyzeEmail, LogsTable) for consistency
+  - Created centralized theme configuration system
+  - All pages now fully responsive and visually cohesive
+
+- **Critical ML Training Fixes**:
+  - Fixed catastrophic forgetting in model retraining
+  - Retraining now combines feedback with original dataset (5574 base samples + feedback)
+  - Added label validation and class distribution logging
+  - Implemented smart stratification (disables for imbalanced tiny datasets)
+  - Added comprehensive error handling and user feedback
+  - Model versioning system validated and stable
+
+- **Initial Replit Setup**:
   - Configured Vite for port 5000 with Replit proxy support
   - Updated CORS to allow all origins for Replit environment
   - Fixed database migration dependencies
@@ -91,6 +109,14 @@ The deployment is configured to run in VM mode:
 - Backend must be running for API calls to work
 - Hot reload is enabled for both frontend and backend
 - Database is automatically managed by Replit
+
+## ML Model Information
+- **Algorithm**: Multinomial Naive Bayes
+- **Base Dataset**: SMS Spam Collection (5,574 samples)
+- **Retraining**: Combines user feedback with original dataset to prevent overfitting
+- **Minimum Feedback**: 10 misclassified samples required for retraining
+- **Label Validation**: Automatically normalizes 'spam', 'ham', 'not spam' labels
+- **Stratification**: Intelligently disabled for tiny/imbalanced datasets to prevent errors
 
 ## Troubleshooting
 - **Backend not responding**: Make sure to run `./run_backend.sh` in a separate shell
