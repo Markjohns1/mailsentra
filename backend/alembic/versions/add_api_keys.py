@@ -11,7 +11,7 @@ from sqlalchemy.sql import func
 
 # revision identifiers, used by Alembic.
 revision = 'add_api_keys'
-down_revision = None  # Replace with your last migration ID
+down_revision = '15ff7144aad5'
 branch_labels = None
 depends_on = None
 
