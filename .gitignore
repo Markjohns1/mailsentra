@@ -15,3 +15,7 @@ frontend/.vite/
 # Environment / Secrets
 .env
 .env.local
+
+# Virtual Environment
+.venv/
+.venv
