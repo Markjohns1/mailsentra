@@ -24,9 +24,9 @@ async def lifespan(app: FastAPI):
     logger.info("Starting up Spam Detection API...")
     
     if not spam_model.is_loaded:
-        logger.warning("⚠️ Model not loaded! Run 'python train_model.py' first")
+        logger.warning(" Model not loaded! Run 'python train_model.py' first")
     else:
-        logger.info("✅ Spam detection model ready")
+        logger.info("Spam detection model ready")
         logger.info(f"   - Version: {spam_model.metadata.get('version', 'unknown')}")
         logger.info(f"   - Accuracy: {spam_model.metadata.get('accuracy', 0) * 100:.2f}%")
     

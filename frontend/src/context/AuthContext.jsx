@@ -16,20 +16,30 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      // Validate token and get user info
-      authService.getMe()
-        .then((userData) => {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token')
+      const userStr = localStorage.getItem('user')
+  
+      if (token && userStr) {
+        try {
+          const userData = JSON.parse(userStr)
           setUser(userData)
-        })
-        .catch(() => {
+        } catch (error) {
+          localStorage.removeItem('user')
+        }
+      } else if (token) {
+        try {
+          const userData = await authService.getMe()
+          setUser(userData)
+          localStorage.setItem('user', JSON.stringify(userData))
+        } catch (error) {
           localStorage.removeItem('token')
-        })
-        .finally(() => setLoading(false))
-    } else {
+        }
+      }
       setLoading(false)
     }
+  
+    initializeAuth()
   }, [])
 
   const login = async (email, password) => {
@@ -37,6 +47,10 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.login(email, password)
       localStorage.setItem('token', response.access_token)
       const userData = await authService.getMe()
+      
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(userData))
+      
       setUser(userData)
       return { success: true }
     } catch (error) {
@@ -61,6 +75,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setUser(null)
     window.location.href = '/login'
   }

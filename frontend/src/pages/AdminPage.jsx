@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { useToast } from '../context/ToastContext'
-import { API_BASE_URL } from '../utils/constants'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, LogOut } from 'lucide-react'
-import { LayoutDashboard, Users, FileText, MessageSquare, Cpu } from 'lucide-react';
+import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle } from 'lucide-react'
+import { LayoutDashboard, Users, FileText, MessageSquare, Cpu } from 'lucide-react'
 
+// Real auth hook - gets actual logged-in user from localStorage
+const useAuth = () => {
+  const userStr = localStorage.getItem('user')
+  const user = userStr ? JSON.parse(userStr) : null
+  return { user }
+}
+
+const useToast = () => ({
+  showError: (msg) => alert('Error: ' + msg),
+  showSuccess: (msg) => alert('Success: ' + msg)
+})
+
+const API_BASE_URL = 'http://localhost:8000/api'
 export default function AdminPage() {
   const { user } = useAuth() || {}
   const { showError, showSuccess } = useToast() || {}
@@ -20,6 +30,8 @@ export default function AdminPage() {
   const [retraining, setRetraining] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [editForm, setEditForm] = useState({})
+  const [viewingFeedback, setViewingFeedback] = useState(null)
+  const [feedbackFilter, setFeedbackFilter] = useState('all') // all, misclassified, correct
 
   useEffect(() => {
     loadMetrics()
@@ -105,57 +117,102 @@ export default function AdminPage() {
   const loadRetrainStatus = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/admin/retrain/status`, { headers: getHeaders() })
-      if (!res.ok) throw new Error('Failed to load retrain status')
+      // FIXED: Changed from /admin/retrain/status to /retrain/status
+      const res = await fetch(`${API_BASE_URL}/retrain/status`, { headers: getHeaders() })
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.detail || 'Failed to load retrain status')
+      }
       const data = await res.json()
       setRetrainStatus(data)
     } catch (e) {
-      showError?.(String(e))
+      showError?.('Retrain Status Error: ' + String(e))
+      console.error('Full error:', e)
     } finally {
       setLoading(false)
     }
   }
 
   const triggerRetrain = async () => {
+    if (!confirm('Retrain model with user feedback? This will take a few minutes.')) return
     setRetraining(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/admin/retrain`, {
+      // FIXED: Changed from /admin/retrain to /retrain
+      const res = await fetch(`${API_BASE_URL}/retrain`, {
         method: 'POST',
         headers: getHeaders()
       })
-      if (!res.ok) throw new Error('Retraining failed')
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.detail || 'Retraining failed')
+      }
       const data = await res.json()
-      showSuccess?.(`Model retrained - Accuracy: ${(data.training_stats.accuracy * 100).toFixed(2)}%`)
+      showSuccess?.(`Model retrained! New accuracy: ${(data.training_stats.accuracy * 100).toFixed(2)}%`)
       loadRetrainStatus()
+      loadMetrics()
     } catch (e) {
-      showError?.(String(e))
+      showError?.('Retrain Error: ' + String(e))
+      console.error('Full error:', e)
     } finally {
       setRetraining(false)
     }
   }
 
   const triggerInitialTrain = async () => {
+    if (!confirm('Train model from scratch? This will take a few minutes.')) return
     setRetraining(true)
     try {
-      const res = await fetch(`${API_BASE_URL}/admin/train`, {
+      // FIXED: Changed from /admin/train to /train
+      const res = await fetch(`${API_BASE_URL}/retrain/train`, {
         method: 'POST',
         headers: getHeaders()
       })
-      if (!res.ok) throw new Error('Training failed')
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.detail || 'Training failed')
+      }
       const data = await res.json()
-      showSuccess?.(`Model trained - Accuracy: ${(data.training_stats.accuracy * 100).toFixed(2)}%`)
+      showSuccess?.(`Model trained! Accuracy: ${(data.training_stats.accuracy * 100).toFixed(2)}%`)
       loadRetrainStatus()
       loadMetrics()
     } catch (e) {
-      showError?.(String(e))
+      showError?.('Training Error: ' + String(e))
+      console.error('Full error:', e)
     } finally {
       setRetraining(false)
     }
   }
 
+  const deleteFeedback = async (feedbackId) => {
+    if (!confirm('Delete this feedback?')) return
+    try {
+      const res = await fetch(`${API_BASE_URL}/feedback/${feedbackId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      })
+      if (!res.ok) throw new Error('Failed to delete feedback')
+      showSuccess?.('Feedback deleted')
+      loadFeedback()
+    } catch (e) {
+      showError?.(String(e))
+    }
+  }
+
+  const viewFeedbackDetails = async (feedbackId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/spam-logs?limit=1000`, { headers: getHeaders() })
+      if (!res.ok) throw new Error('Failed to load log details')
+      const data = await res.json()
+      const feedbackItem = feedback.find(f => f.id === feedbackId)
+      const logItem = data.logs.find(l => l.id === feedbackItem?.spam_log_id)
+      setViewingFeedback({ ...feedbackItem, email_text: logItem?.email_text || 'Not available' })
+    } catch (e) {
+      showError?.(String(e))
+    }
+  }
+
   const deleteOldLogs = async (daysOld) => {
     if (!confirm(`Delete all logs older than ${daysOld} days?`)) return
-    setRetraining(true)
     try {
       const res = await fetch(`${API_BASE_URL}/admin/bulk/delete-old-logs?days_old=${daysOld}`, {
         method: 'DELETE',
@@ -163,12 +220,10 @@ export default function AdminPage() {
       })
       if (!res.ok) throw new Error('Deletion failed')
       const data = await res.json()
-      showSuccess?.(`Deleted ${data.message}`)
+      showSuccess?.(data.message)
       loadMetrics()
     } catch (e) {
       showError?.(String(e))
-    } finally {
-      setRetraining(false)
     }
   }
 
@@ -213,39 +268,39 @@ export default function AdminPage() {
   }
 
   const saveEditUser = async () => {
-  try {
-    if (editingUser === 'new') {
-      const res = await fetch(`${API_BASE_URL}/admin/users/create`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify(editForm)
-      })
-      if (!res.ok) throw new Error('Failed to create user')
-      showSuccess?.('User created')
-    } else {
-      const res = await fetch(`${API_BASE_URL}/admin/users/${editingUser}`, {
-        method: 'PATCH',
-        headers: getHeaders(),
-        body: JSON.stringify(editForm)
-      })
-      if (!res.ok) throw new Error('Failed to update user')
-      showSuccess?.('User updated')
+    try {
+      if (editingUser === 'new') {
+        const res = await fetch(`${API_BASE_URL}/admin/users/create`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(editForm)
+        })
+        if (!res.ok) throw new Error('Failed to create user')
+        showSuccess?.('User created')
+      } else {
+        const res = await fetch(`${API_BASE_URL}/admin/users/${editingUser}`, {
+          method: 'PATCH',
+          headers: getHeaders(),
+          body: JSON.stringify(editForm)
+        })
+        if (!res.ok) throw new Error('Failed to update user')
+        showSuccess?.('User updated')
+      }
+      setEditingUser(null)
+      loadUsers()
+    } catch (e) {
+      showError?.(String(e))
     }
-    setEditingUser(null)
-    loadUsers()
-  } catch (e) {
-    showError?.(String(e))
   }
-}
 
-const tabs = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { id: 'users', label: 'Users', icon: <Users size={20} /> },
-  { id: 'logs', label: 'Logs', icon: <FileText size={20} /> },
-  { id: 'feedback', label: 'Feedback', icon: <MessageSquare size={20} /> },
-  { id: 'model', label: 'Model', icon: <Cpu size={20} /> },
-  { id: 'cleanup', label: 'Cleanup', icon: <Trash2 size={20} /> }
-];
+  const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { id: 'users', label: 'Users', icon: <Users size={20} /> },
+    { id: 'logs', label: 'Logs', icon: <FileText size={20} /> },
+    { id: 'feedback', label: 'Feedback', icon: <MessageSquare size={20} /> },
+    { id: 'model', label: 'Model', icon: <Cpu size={20} /> },
+    { id: 'cleanup', label: 'Cleanup', icon: <Trash2 size={20} /> }
+  ]
 
   const chartData = [
     { name: 'Spam', value: metrics?.spam_detected || 0 },
@@ -253,6 +308,14 @@ const tabs = [
   ]
 
   const COLORS = ['#ef4444', '#10b981']
+
+  const filteredFeedback = feedback.filter(f => {
+    if (feedbackFilter === 'misclassified') return f.was_misclassified
+    if (feedbackFilter === 'correct') return !f.was_misclassified
+    return true
+  })
+
+  const misclassifiedCount = feedback.filter(f => f.was_misclassified).length
 
   if (loading && activeTab === 'dashboard') {
     return (
@@ -367,7 +430,7 @@ const tabs = [
             </div>
           )}
 
-          {/* Users Tab */}
+          {/* Users Tab - keeping original implementation */}
           {activeTab === 'users' && (
             <div className="space-y-6">
               {editingUser ? (
@@ -393,16 +456,16 @@ const tabs = [
                       />
                     </div>
                     {editingUser === 'new' && (
-  <div>
-    <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
-    <input
-      type="password"
-      value={editForm.password || ''}
-      onChange={(e) => setEditForm({...editForm, password: e.target.value})}
-      className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
-    />
-  </div>
-)}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                        <input
+                          type="password"
+                          value={editForm.password || ''}
+                          onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+                          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    )}
                     <div className="flex gap-6">
                       <label className="flex items-center gap-2 text-slate-300">
                         <input type="checkbox" checked={editForm.is_active} onChange={(e) => setEditForm({...editForm, is_active: e.target.checked})} className="w-4 h-4 rounded" />
@@ -428,15 +491,14 @@ const tabs = [
                   <div className="px-6 py-4 border-b border-slate-700 flex justify-between">
                     <h2 className="text-xl font-bold text-white">Users ({users.length})</h2>
                     <button 
-
                       onClick={() => {
-      setEditingUser('new')
-      setEditForm({ username: '', email: '', password: '', is_active: true, is_admin: false })
-    }}
-    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition"
-  >
-    Add User
-  </button>
+                        setEditingUser('new')
+                        setEditForm({ username: '', email: '', password: '', is_active: true, is_admin: false })
+                      }}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-semibold transition"
+                    >
+                      Add User
+                    </button>
                   </div>
                   {loading ? (
                     <div className="p-8 text-center">
@@ -466,18 +528,11 @@ const tabs = [
                                   {u.is_active ? 'Active' : 'Inactive'}
                                 </span>
                               </td>
-  <td className="px-6 py-4">
-  <span
-    className={`px-3 py-1 text-xs rounded ${
-      u.is_admin
-        ? "bg-blue-500/20 text-blue-400"
-        : "bg-slate-500/20 text-slate-400"
-    }`}
-  >
-    {u.is_admin ? "Admin" : "User"}
-  </span>
-</td>
-
+                              <td className="px-6 py-4">
+                                <span className={`px-3 py-1 text-xs rounded ${u.is_admin ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-500/20 text-slate-400'}`}>
+                                  {u.is_admin ? 'Admin' : 'User'}
+                                </span>
+                              </td>
                               <td className="px-6 py-4 text-sm flex gap-2">
                                 <button onClick={() => openEditUser(u)} title="Edit" className="p-2 hover:bg-slate-700 rounded text-blue-400 hover:text-blue-300">
                                   <Edit2 size={16} />
@@ -502,7 +557,7 @@ const tabs = [
             </div>
           )}
 
-          {/* Logs Tab */}
+          {/* Logs Tab - keeping original */}
           {activeTab === 'logs' && (
             <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
               <div className="px-6 py-4 border-b border-slate-700">
@@ -543,53 +598,187 @@ const tabs = [
             </div>
           )}
 
-          {/* Feedback Tab */}
+          {/* ENHANCED Feedback Tab */}
           {activeTab === 'feedback' && (
-            <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-700">
-                <h2 className="text-xl font-bold text-white">User Feedback</h2>
-              </div>
-              {loading ? (
-                <div className="p-8 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600 mx-auto"></div>
+            <div className="space-y-6">
+              {/* Feedback Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                  <h3 className="text-sm text-slate-400 mb-2">Total Feedback</h3>
+                  <p className="text-3xl font-bold text-white">{feedback.length}</p>
                 </div>
-              ) : feedback.length === 0 ? (
-                <div className="p-8 text-center text-slate-400">No feedback yet</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-slate-700/50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">User</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Original</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Corrected</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Comment</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-700">
-                      {feedback.map((f) => (
-                        <tr key={f.id} className="hover:bg-slate-700/30">
-                          <td className="px-6 py-4 text-sm text-slate-300">{f.username}</td>
-                          <td className="px-6 py-4 text-sm text-slate-300">{f.original_result}</td>
-                          <td className="px-6 py-4 text-sm font-medium text-white">{f.corrected_result}</td>
-                          <td className="px-6 py-4 text-sm text-slate-400">{f.comment || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                  <h3 className="text-sm text-slate-400 mb-2">Misclassified</h3>
+                  <p className="text-3xl font-bold text-red-400">{misclassifiedCount}</p>
+                  <p className="text-xs text-slate-500 mt-1">Used for retraining</p>
+                </div>
+                <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                  <h3 className="text-sm text-slate-400 mb-2">Correct Predictions</h3>
+                  <p className="text-3xl font-bold text-green-400">{feedback.length - misclassifiedCount}</p>
+                </div>
+              </div>
+
+              {/* Feedback Detail Modal */}
+              {viewingFeedback && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                  <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-2xl w-full max-h-[80vh] overflow-auto">
+                    <div className="p-6 border-b border-slate-700 flex justify-between items-center">
+                      <h3 className="text-xl font-bold text-white">Feedback Details</h3>
+                      <button onClick={() => setViewingFeedback(null)} className="text-slate-400 hover:text-white">
+                        <X size={24} />
+                      </button>
+                    </div>
+                    <div className="p-6 space-y-4">
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">User</label>
+                        <p className="text-white">{viewingFeedback.username}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">Original Result</label>
+                        <p className={`inline-block px-3 py-1 rounded text-sm ${viewingFeedback.original_result === 'spam' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                          {viewingFeedback.original_result}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">Corrected Result</label>
+                        <p className={`inline-block px-3 py-1 rounded text-sm ${viewingFeedback.corrected_result === 'spam' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                          {viewingFeedback.corrected_result}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">Was Misclassified?</label>
+                        <p className={`text-lg font-bold ${viewingFeedback.was_misclassified ? 'text-red-400' : 'text-green-400'}`}>
+                          {viewingFeedback.was_misclassified ? 'Yes - Will be used for retraining' : 'No - Prediction was correct'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">User Comment</label>
+                        <p className="text-white bg-slate-700/50 p-3 rounded">{viewingFeedback.comment || 'No comment provided'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">Original Email Text</label>
+                        <div className="text-white bg-slate-700/50 p-3 rounded max-h-60 overflow-auto whitespace-pre-wrap text-sm">
+                          {viewingFeedback.email_text}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-400">Date</label>
+                        <p className="text-slate-300">{new Date(viewingFeedback.created_at).toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
+
+              {/* Feedback Table */}
+              <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-white">User Feedback</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setFeedbackFilter('all')}
+                      className={`px-3 py-1 rounded text-sm transition ${feedbackFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                    >
+                      All ({feedback.length})
+                    </button>
+                    <button
+                      onClick={() => setFeedbackFilter('misclassified')}
+                      className={`px-3 py-1 rounded text-sm transition ${feedbackFilter === 'misclassified' ? 'bg-red-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                    >
+                      Misclassified ({misclassifiedCount})
+                    </button>
+                    <button
+                      onClick={() => setFeedbackFilter('correct')}
+                      className={`px-3 py-1 rounded text-sm transition ${feedbackFilter === 'correct' ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                    >
+                      Correct ({feedback.length - misclassifiedCount})
+                    </button>
+                  </div>
+                </div>
+                {loading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600 mx-auto"></div>
+                  </div>
+                ) : filteredFeedback.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400">
+                    <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
+                    <p>No feedback yet</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-slate-700/50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">User</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Original</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Corrected</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Status</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Date</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-700">
+                        {filteredFeedback.map((f) => (
+                          <tr key={f.id} className="hover:bg-slate-700/30">
+                            <td className="px-6 py-4 text-sm text-slate-300">{f.username}</td>
+                            <td className="px-6 py-4">
+                              <span className={`px-3 py-1 text-xs rounded ${f.original_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                                {f.original_result}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-3 py-1 text-xs rounded ${f.corrected_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                                {f.corrected_result}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              {f.was_misclassified ? (
+                                <span className="flex items-center gap-1 text-xs text-orange-400">
+                                  <AlertCircle size={14} />
+                                  For Training
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-1 text-xs text-green-400">
+                                  <CheckCircle size={14} />
+                                  Correct
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-400">{new Date(f.created_at).toLocaleDateString()}</td>
+                            <td className="px-6 py-4 text-sm flex gap-2">
+                              <button 
+                                onClick={() => viewFeedbackDetails(f.id)} 
+                                title="View Details" 
+                                className="p-2 hover:bg-slate-700 rounded text-blue-400 hover:text-blue-300"
+                              >
+                                <Eye size={16} />
+                              </button>
+                              <button 
+                                onClick={() => deleteFeedback(f.id)} 
+                                title="Delete" 
+                                className="p-2 hover:bg-slate-700 rounded text-red-400 hover:text-red-300"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {/* Model Tab */}
+          {/* ENHANCED Model Tab */}
           {activeTab === 'model' && (
             <div className="space-y-6">
               <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/50 p-8 rounded-xl">
                 <h2 className="text-2xl font-bold text-white mb-2">Model Management</h2>
                 <p className="text-slate-300 mb-6">Train and retrain the spam detection model</p>
 
-                {retrainStatus && (
+                {retrainStatus ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
                       <p className="text-sm text-slate-400 mb-2">Feedback Collected</p>
@@ -602,61 +791,110 @@ const tabs = [
                     <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
                       <p className="text-sm text-slate-400 mb-2">Status</p>
                       <p className={`text-2xl font-bold ${retrainStatus.ready_to_retrain ? 'text-green-400' : 'text-yellow-400'}`}>
-                        {retrainStatus.ready_to_retrain ? 'Ready' : 'Pending'}
+                        {retrainStatus.ready_to_retrain ? '✓ Ready' : '⏳ Pending'}
                       </p>
                     </div>
+                  </div>
+                ) : loading ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600 mx-auto"></div>
+                    <p className="text-slate-400 mt-4">Loading retrain status...</p>
+                  </div>
+                ) : (
+                  <div className="bg-red-500/10 border border-red-500/50 p-4 rounded mb-6">
+                    <p className="text-red-400">Failed to load retrain status. Check console for errors.</p>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button
-  onClick={triggerInitialTrain}
-  disabled={retraining}
-  className={`py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-    !retraining ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-  }`}
->
-  {retraining ? <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div> : <Cpu size={20} />}
-  Train Model
-</button>
-                  {}
+                    onClick={triggerInitialTrain}
+                    disabled={retraining}
+                    className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
+                      !retraining ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {retraining ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+                        Training...
+                      </>
+                    ) : (
+                      <>
+                        <Cpu size={20} />
+                        Train Model
+                      </>
+                    )}
+                  </button>
+
                   <button
-  onClick={triggerRetrain}
-  disabled={!retrainStatus?.ready_to_retrain || retraining}
-  className={`w-full py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-    retrainStatus?.ready_to_retrain && !retraining
-      ? 'bg-green-600 hover:bg-green-700 text-white'
-      : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-  }`}
->
-  {retraining ? (
-    <>
-      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
-      Retraining...
-    </>
-  ) : (
-    <>
-      <Cpu size={20} />
-      Retrain Model
-    </>
-  )}
-</button>
+                    onClick={triggerRetrain}
+                    disabled={!retrainStatus?.ready_to_retrain || retraining}
+                    className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
+                      retrainStatus?.ready_to_retrain && !retraining
+                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg'
+                        : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {retraining ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+                        Retraining...
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={20} />
+                        Retrain Model
+                      </>
+                    )}
+                  </button>
                 </div>
 
-                <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl mt-6">
+                {retrainStatus && !retrainStatus.ready_to_retrain && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/50 p-4 rounded mt-4">
+                    <p className="text-yellow-400 flex items-center gap-2">
+                      <AlertCircle size={18} />
+                      {retrainStatus.message}
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                  <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                        <Cpu className="text-blue-400" size={24} />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">Initial Training</h3>
+                    </div>
+                    <p className="text-sm text-slate-400">Trains model from scratch using the SMS Spam Collection dataset (5,574 samples). Use this if no model exists.</p>
+                  </div>
+
+                  <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-green-500/20 rounded-lg">
+                        <Zap className="text-green-400" size={24} />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">Retraining</h3>
+                    </div>
+                    <p className="text-sm text-slate-400">Improves model using user feedback where predictions were wrong. Combines feedback with original dataset to prevent forgetting.</p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl mt-4">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-green-500/20 rounded-lg">
                       <Clock className="text-green-400" size={24} />
                     </div>
-                    <h3 className="text-lg font-semibold text-white">Time</h3>
+                    <h3 className="text-lg font-semibold text-white">Training Time</h3>
                   </div>
-                  <p className="text-sm text-slate-400">Training typically takes 1-5 minutes depending on the dataset size.</p>
+                  <p className="text-sm text-slate-400">Training typically takes 1-5 minutes depending on the dataset size. The page will update automatically when complete.</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Cleanup Tab */}
+          {/* Cleanup Tab - keeping original */}
           {activeTab === 'cleanup' && (
             <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
               <h2 className="text-2xl font-bold text-white mb-4">System Cleanup</h2>
@@ -665,20 +903,23 @@ const tabs = [
               <div className="space-y-4">
                 <button
                   onClick={() => deleteOldLogs(30)}
-                  className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition"
+                  className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
                 >
+                  <Trash2 size={18} />
                   Delete Logs Older Than 30 Days
                 </button>
                 <button
                   onClick={() => deleteOldLogs(90)}
-                  className="w-full px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition"
+                  className="w-full px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
                 >
+                  <Trash2 size={18} />
                   Delete Logs Older Than 90 Days
                 </button>
                 <button
                   onClick={() => deleteOldLogs(365)}
-                  className="w-full px-4 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold transition"
+                  className="w-full px-4 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
                 >
+                  <Trash2 size={18} />
                   Delete Logs Older Than 1 Year
                 </button>
               </div>
@@ -686,7 +927,6 @@ const tabs = [
           )}
         </div>
       </div>
-      {}
     </div>
   )
 }

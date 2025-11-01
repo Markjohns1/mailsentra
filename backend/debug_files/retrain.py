@@ -27,7 +27,7 @@ class RetrainStatusResponse(BaseModel):
     min_required: int
     message: str
 
-@router.get("/status", response_model=RetrainStatusResponse)
+@router.get("/retrain/status", response_model=RetrainStatusResponse)
 def get_retrain_status(
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
@@ -92,7 +92,7 @@ def train_initial_model(
             detail=f"Training failed: {str(e)}"
         )
 
-@router.post("", response_model=RetrainResponse)
+@router.post("/retrain", response_model=RetrainResponse)
 def retrain_model(
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
