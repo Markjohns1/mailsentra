@@ -245,21 +245,42 @@ def retrain_model(
         logger.info(f"Collecting {len(feedbacks)} misclassified samples...")
 
         training_data = []
+        missing_logs = 0
+        empty_texts = 0
+        
         for feedback in feedbacks:
             spam_log = db.query(SpamLog).filter(
                 SpamLog.id == feedback.spam_log_id
             ).first()
 
-            if spam_log and spam_log.email_text:
-                training_data.append({
-                    'text': spam_log.email_text,
-                    'label': feedback.corrected_result.lower().strip()
-                })
+            if not spam_log:
+                missing_logs += 1
+                logger.warning(f"Spam log {feedback.spam_log_id} not found for feedback {feedback.id}")
+                continue
+                
+            if not spam_log.email_text or spam_log.email_text.strip() == "":
+                empty_texts += 1
+                logger.warning(f"Spam log {feedback.spam_log_id} has empty email_text")
+                continue
+                
+            # Validate corrected_result
+            corrected = feedback.corrected_result.lower().strip()
+            if corrected not in ['spam', 'ham']:
+                logger.warning(f"Invalid corrected_result '{feedback.corrected_result}' for feedback {feedback.id}")
+                continue
+
+            training_data.append({
+                'text': spam_log.email_text,
+                'label': corrected
+            })
+
+        if missing_logs > 0 or empty_texts > 0:
+            logger.warning(f"Found {missing_logs} missing logs and {empty_texts} empty texts")
 
         if not training_data:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="No valid training data found in feedback"
+                detail=f"No valid training data found. Missing logs: {missing_logs}, Empty texts: {empty_texts}, Total feedback: {len(feedbacks)}"
             )
 
         logger.info(f"Prepared {len(training_data)} training samples")

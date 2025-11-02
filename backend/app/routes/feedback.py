@@ -56,12 +56,17 @@ def submit_feedback(
                 detail="Spam log not found or does not belong to you"
             )
         
-        # Validate corrected result
-        if feedback_data.corrected_result.lower() not in ["spam", "ham"]:
+        # Validate and normalize corrected result
+        corrected = feedback_data.corrected_result.lower().strip()
+        if corrected in ["not spam", "not-spam"]:
+            corrected = "ham"
+        if corrected not in ["spam", "ham"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Corrected result must be 'spam' or 'ham'"
+                detail="Corrected result must be 'spam' or 'ham' (or 'not spam')"
             )
+        # Normalize to lowercase
+        feedback_data.corrected_result = corrected
         
         # Check if feedback already exists for this log
         existing_feedback = db.query(UserFeedback).filter(

@@ -129,17 +129,17 @@ const LogsTable = () => {
                           {submitting[log.id] ? '...' : 'Spam'}
                         </button>
                         <button
-                          onClick={() => handleFeedback(log.id, 'not spam')}
+                          onClick={() => handleFeedback(log.id, 'ham')}
                           disabled={submitting[log.id]}
                           className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                             submitting[log.id]
                               ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed border border-slate-600'
                               : 'bg-green-500/20 text-green-300 hover:bg-green-500/30 border-2 border-green-500/50 hover:shadow-lg hover:shadow-green-500/20'
                           }`}
-                          title="Report as not spam if misclassified"
+                          title="Report as ham (not spam) if misclassified"
                         >
                           <ThumbsUp className="h-3 w-3" />
-                          {submitting[log.id] ? '...' : 'Not Spam'}
+                          {submitting[log.id] ? '...' : 'Ham'}
                         </button>
                       </div>
                     ) : (

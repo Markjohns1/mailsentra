@@ -91,14 +91,24 @@ def get_logs_stats(
         # Get accuracy (logs with feedback)
         feedback_logs = [log for log in all_logs if log.is_correct is not None]
         accurate = sum(1 for log in feedback_logs if log.is_correct)
-        accuracy_rate = (accurate / len(feedback_logs)) * 100 if feedback_logs else 0
+        feedback_accuracy = (accurate / len(feedback_logs)) * 100 if feedback_logs else None
+        
+        # Get model accuracy from model service (always show this as primary)
+        from app.services.model_service import spam_model
+        model_accuracy = 0.0
+        if spam_model.is_loaded:
+            model_accuracy = spam_model.metadata.get('accuracy', 0.0) * 100
+        
+        # Use model accuracy as primary (this is the actual model performance)
+        # Feedback accuracy is secondary and only relevant if user has given feedback
+        final_accuracy = model_accuracy if model_accuracy > 0 else (feedback_accuracy if feedback_accuracy is not None else 0.0)
         
         return {
             "total_analyses": total,
             "spam_detected": spam_count,
             "ham_detected": ham_count,
             "feedback_count": len(feedback_logs),
-            "accuracy_rate": round(accuracy_rate, 2),
+            "accuracy_rate": round(final_accuracy, 2),
             "spam_percentage": round((spam_count / total * 100), 2) if total > 0 else 0
         }
         
@@ -107,4 +117,26 @@ def get_logs_stats(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get stats: {str(e)}"
         )
+
+@router.get("/dashboard/stats")
+def get_dashboard_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get dashboard statistics (alias for /logs/stats)
+    This endpoint exists to support frontend polling
+    """
+    return get_logs_stats(current_user, db)
+
+@router.get("/alerts")
+def get_alerts(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get system alerts and notifications
+    Currently returns empty array - can be extended later
+    """
+    return []
 
