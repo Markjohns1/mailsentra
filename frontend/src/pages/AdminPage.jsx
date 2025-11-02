@@ -200,12 +200,12 @@ export default function AdminPage() {
 
   const viewFeedbackDetails = async (feedbackId) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/admin/spam-logs?limit=1000`, { headers: getHeaders() })
-      if (!res.ok) throw new Error('Failed to load log details')
+      const res = await fetch(`${API_BASE_URL}/feedback/${feedbackId}/details`, { 
+        headers: getHeaders() 
+      })
+      if (!res.ok) throw new Error('Failed to load feedback details')
       const data = await res.json()
-      const feedbackItem = feedback.find(f => f.id === feedbackId)
-      const logItem = data.logs.find(l => l.id === feedbackItem?.spam_log_id)
-      setViewingFeedback({ ...feedbackItem, email_text: logItem?.email_text || 'Not available' })
+      setViewingFeedback(data)
     } catch (e) {
       showError?.(String(e))
     }

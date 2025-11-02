@@ -132,3 +132,81 @@ def get_feedback_count(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get feedback count: {str(e)}"
         )
+
+@router.delete("/feedback/{feedback_id}", status_code=status.HTTP_200_OK)
+def delete_feedback(
+    feedback_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a feedback entry (admin only or owner)"""
+    try:
+        feedback = db.query(UserFeedback).filter(UserFeedback.id == feedback_id).first()
+        
+        if not feedback:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Feedback not found"
+            )
+        
+        # Allow deletion if user is admin or owns the feedback
+        if not current_user.is_admin and feedback.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to delete this feedback"
+            )
+        
+        db.delete(feedback)
+        db.commit()
+        
+        return {"message": "Feedback deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete feedback: {str(e)}"
+        )
+
+
+@router.get("/feedback/{feedback_id}/details")
+def get_feedback_details(
+    feedback_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get detailed feedback with original email text"""
+    try:
+        feedback = db.query(UserFeedback).filter(UserFeedback.id == feedback_id).first()
+        
+        if not feedback:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Feedback not found"
+            )
+        
+        # Get the related spam log
+        spam_log = db.query(SpamLog).filter(SpamLog.id == feedback.spam_log_id).first()
+        
+        return {
+            "id": feedback.id,
+            "user_id": feedback.user_id,
+            "username": feedback.user.username if feedback.user else "Unknown",
+            "spam_log_id": feedback.spam_log_id,
+            "original_result": feedback.original_result,
+            "corrected_result": feedback.corrected_result,
+            "comment": feedback.comment,
+            "was_misclassified": feedback.original_result != feedback.corrected_result,
+            "email_text": spam_log.email_text if spam_log else "Not available",
+            "created_at": feedback.created_at
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get feedback details: {str(e)}"
+        )
