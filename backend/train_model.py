@@ -82,12 +82,36 @@ def load_dataset(filepath):
     logger.info(f"📂 Loading dataset from {filepath}")
 
     try:
-        if 'SMSSpamCollection' in filepath:
+        if 'SMSSpamCollection' in filepath and Path(filepath).exists():
             # Original dataset format (tab-separated, no header)
             df = pd.read_csv(filepath, sep='\t', names=['label', 'message'])
+        elif filepath.endswith('.csv'):
+            # CSV format - try different formats
+            try:
+                # Try with header first
+                df = pd.read_csv(filepath)
+                # Normalize column names
+                if 'text' in df.columns and 'message' not in df.columns:
+                    df = df.rename(columns={'text': 'message'})
+                if 'label' not in df.columns:
+                    raise ValueError("CSV must have 'label' column")
+                if 'message' not in df.columns:
+                    raise ValueError("CSV must have 'message' or 'text' column")
+            except pd.errors.EmptyDataError:
+                raise ValueError("CSV file is empty")
         else:
             # Sample dataset format
             df = pd.read_csv(filepath)
+
+        # Normalize labels
+        df['label'] = df['label'].str.lower().str.strip()
+        df['label'] = df['label'].replace('not spam', 'ham')
+        
+        # Validate labels
+        valid_labels = {'spam', 'ham'}
+        invalid_labels = set(df['label'].unique()) - valid_labels
+        if invalid_labels:
+            raise ValueError(f"Invalid labels found: {invalid_labels}. Labels must be 'spam' or 'ham'")
 
         logger.info(f"✅ Loaded {len(df)} messages")
         logger.info(f"   - Spam: {(df['label'] == 'spam').sum()}")
@@ -343,15 +367,26 @@ def train_model_from_data(training_data, test_size=0.2):
         logger.error(f"❌ Retraining failed: {e}")
         raise
 
-def main():
-    """Main training pipeline"""
+def main(dataset_path: str = None):
+    """
+    Main training pipeline
+    
+    Args:
+        dataset_path: Optional path to dataset file. If None, downloads default dataset.
+    """
     logger.info("=" * 60)
     logger.info("🚀 Starting Spam Detection Model Training")
     logger.info("=" * 60)
 
     try:
-        # Step 1: Download dataset
-        dataset_path = download_dataset()
+        # Step 1: Get dataset path
+        if dataset_path:
+            logger.info(f"📂 Using custom dataset: {dataset_path}")
+            if not Path(dataset_path).exists():
+                raise FileNotFoundError(f"Dataset file not found: {dataset_path}")
+        else:
+            # Download default dataset
+            dataset_path = download_dataset()
 
         # Step 2: Load dataset
         df = load_dataset(dataset_path)
@@ -370,6 +405,7 @@ def main():
         logger.info(f"   Model saved at: {model_path}")
         logger.info(f"   Accuracy: {accuracy * 100:.2f}%")
         logger.info(f"   Version: {version}")
+        logger.info(f"   Dataset: {dataset_path}")
         logger.info("=" * 60)
 
     except Exception as e:

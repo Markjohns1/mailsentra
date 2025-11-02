@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Shield } from 'lucide-react'
+import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Shield, Upload, FileText as FileTextIcon, BookOpen } from 'lucide-react'
 import { LayoutDashboard, Users, FileText, MessageSquare, Cpu } from 'lucide-react'
 
 // Real auth hook - gets actual logged-in user from localStorage
@@ -32,6 +32,8 @@ export default function AdminPage() {
   const [editForm, setEditForm] = useState({})
   const [viewingFeedback, setViewingFeedback] = useState(null)
   const [feedbackFilter, setFeedbackFilter] = useState('all') // all, misclassified, correct
+  const [uploadedDataset, setUploadedDataset] = useState(null)
+  const [uploadingDataset, setUploadingDataset] = useState(false)
 
   useEffect(() => {
     loadMetrics()
@@ -44,12 +46,16 @@ export default function AdminPage() {
     else if (activeTab === 'model') loadRetrainStatus()
   }, [activeTab])
 
-  const getHeaders = () => {
+  const getHeaders = (includeContentType = true) => {
     const token = localStorage.getItem('token')
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` })
+    const headers = {}
+    if (includeContentType) {
+      headers['Content-Type'] = 'application/json'
     }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+    return headers
   }
 
   const loadMetrics = async () => {
@@ -158,14 +164,56 @@ export default function AdminPage() {
     }
   }
 
-  const triggerInitialTrain = async () => {
-    if (!confirm('Train model from scratch? This will take a few minutes.')) return
+  const uploadDataset = async (file) => {
+    if (!file) return
+    if (!file.name.endsWith('.csv')) {
+      showError?.('Only CSV files are supported')
+      return
+    }
+    
+    setUploadingDataset(true)
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/retrain/upload-dataset`, {
+        method: 'POST',
+        headers: getHeaders(false), // No Content-Type for FormData - browser sets it with boundary
+        body: formData
+      })
+      
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.detail || 'Upload failed')
+      }
+      
+      const data = await res.json()
+      setUploadedDataset(data)
+      showSuccess?.(`Dataset uploaded! ${data.total_samples} samples (${data.spam_samples} spam, ${data.ham_samples} ham)`)
+    } catch (e) {
+      showError?.('Upload Error: ' + String(e))
+      console.error('Full error:', e)
+    } finally {
+      setUploadingDataset(false)
+    }
+  }
+
+  const triggerInitialTrain = async (customDatasetPath = null) => {
+    const msg = customDatasetPath 
+      ? `Train model with uploaded dataset? This will take a few minutes.`
+      : `Train model from scratch? This will take a few minutes.`
+    if (!confirm(msg)) return
+    
     setRetraining(true)
     try {
-      // FIXED: Changed from /admin/train to /train
+      const body = customDatasetPath ? JSON.stringify({ dataset_path: customDatasetPath }) : null
       const res = await fetch(`${API_BASE_URL}/retrain/train`, {
         method: 'POST',
-        headers: getHeaders()
+        headers: {
+          ...getHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: body
       })
       if (!res.ok) {
         const errorData = await res.json()
@@ -173,6 +221,7 @@ export default function AdminPage() {
       }
       const data = await res.json()
       showSuccess?.(`Model trained! Accuracy: ${(data.training_stats.accuracy * 100).toFixed(2)}%`)
+      setUploadedDataset(null) // Reset after successful training
       loadRetrainStatus()
       loadMetrics()
     } catch (e) {
@@ -819,23 +868,121 @@ export default function AdminPage() {
                   </div>
                 )}
 
+                {/* Dataset Upload Section */}
+                <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-cyan-500/20 rounded-lg border border-cyan-500/30">
+                      <Upload className="text-cyan-400" size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">Upload Custom Dataset</h3>
+                      <p className="text-sm text-slate-400">Upload a CSV file with 'label' and 'message' columns</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
+                      <label className="flex-1 cursor-pointer">
+                        <input
+                          type="file"
+                          accept=".csv"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) uploadDataset(file)
+                          }}
+                          className="hidden"
+                          disabled={uploadingDataset}
+                        />
+                        <div className={`w-full px-4 py-3 bg-slate-900/50 border-2 border-dashed rounded-lg transition-all flex items-center justify-center gap-2 ${
+                          uploadingDataset
+                            ? 'border-slate-600 text-slate-500 cursor-not-allowed'
+                            : 'border-cyan-500/50 hover:border-cyan-500 text-cyan-300 hover:bg-cyan-500/10'
+                        }`}>
+                          {uploadingDataset ? (
+                            <>
+                              <div className="animate-spin rounded-full h-5 w-5 border-2 border-cyan-500/30 border-t-cyan-400"></div>
+                              <span>Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-5 w-5" />
+                              <span>Choose CSV File</span>
+                            </>
+                          )}
+                        </div>
+                      </label>
+                    </div>
+                    
+                    {uploadedDataset && (
+                      <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 animate-fade-in">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="text-green-300 font-semibold mb-1 flex items-center gap-2">
+                              <CheckCircle size={18} />
+                              Dataset Uploaded Successfully
+                            </p>
+                            <p className="text-sm text-slate-400">{uploadedDataset.filename}</p>
+                          </div>
+                          <button
+                            onClick={() => setUploadedDataset(null)}
+                            className="text-slate-400 hover:text-white"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-3 text-sm">
+                          <div>
+                            <p className="text-slate-400">Total</p>
+                            <p className="text-white font-bold">{uploadedDataset.total_samples}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400">Spam</p>
+                            <p className="text-red-300 font-bold">{uploadedDataset.spam_samples}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400">Ham</p>
+                            <p className="text-green-300 font-bold">{uploadedDataset.ham_samples}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => triggerInitialTrain(uploadedDataset.file_path)}
+                          disabled={retraining}
+                          className="mt-3 w-full px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-cyan-500/50 flex items-center justify-center gap-2 cyber-glow-hover btn-cyber disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {retraining ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
+                              Training...
+                            </>
+                          ) : (
+                            <>
+                              <Cpu size={18} />
+                              Train with Uploaded Dataset
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <button
-                    onClick={triggerInitialTrain}
+                    onClick={() => triggerInitialTrain()}
                     disabled={retraining}
                     className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-                      !retraining ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg' : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                      !retraining ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg hover:shadow-blue-500/50' : 'bg-slate-700 text-slate-400 cursor-not-allowed'
                     }`}
                   >
                     {retraining ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
                         Training...
                       </>
                     ) : (
                       <>
                         <Cpu size={20} />
-                        Train Model
+                        Train with Default Dataset
                       </>
                     )}
                   </button>
@@ -872,10 +1019,24 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <div className="card-cyber border-cyan-500/20 p-6 rounded-xl">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <div className="p-2 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
+                        <Upload className="text-cyan-400" size={24} />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white">Upload Dataset</h3>
+                    </div>
+                    <p className="text-sm text-slate-400 mb-3">Upload your own CSV file with spam/ham labels. Format: label,message columns.</p>
+                    <div className="text-xs text-cyan-400 flex items-center gap-2">
+                      <BookOpen size={14} />
+                      <span>CSV format: label,message columns</span>
+                    </div>
+                  </div>
+
+                  <div className="card-cyber border-blue-500/20 p-6 rounded-xl">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
                         <Cpu className="text-blue-400" size={24} />
                       </div>
                       <h3 className="text-lg font-semibold text-white">Initial Training</h3>
@@ -883,9 +1044,9 @@ export default function AdminPage() {
                     <p className="text-sm text-slate-400">Trains model from scratch using the SMS Spam Collection dataset (5,574 samples). Use this if no model exists.</p>
                   </div>
 
-                  <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl">
+                  <div className="card-cyber border-green-500/20 p-6 rounded-xl">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 bg-green-500/20 rounded-lg">
+                      <div className="p-2 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-lg border border-green-500/30">
                         <Zap className="text-green-400" size={24} />
                       </div>
                       <h3 className="text-lg font-semibold text-white">Retraining</h3>

@@ -48,6 +48,8 @@ MailSentra is a production-ready, full-stack email spam detection system powered
 | **Analysis History** | Searchable log with filtering | ✅ Production |
 | **Feedback Loop** | User corrections for model improvement | ✅ Production |
 | **Model Retraining** | Admin-controlled retraining pipeline | ✅ Production |
+| **Dataset Upload** | **NEW!** Admin upload CSV datasets for training | ✅ Production |
+| **Custom Training** | **NEW!** Train models with your own datasets | ✅ Production |
 | **Analytics** | System metrics and performance tracking | ✅ Production |
 | **Rate Limiting** | API protection and abuse prevention | ✅ Production |
 | **Audit Logging** | Comprehensive activity tracking | ✅ Production |
@@ -129,6 +131,8 @@ npm run dev
 | [API Reference](docs/API.md) | Complete API endpoint documentation |
 | [Development Guide](docs/DEVELOPMENT.md) | Setup and development workflows |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment instructions |
+| [Training Guide](docs/TRAINING_GUIDE.md) | **NEW!** Model training & dataset management |
+| [Training Quick Start](docs/TRAINING_QUICK_START.md) | Quick reference for training workflows |
 
 ## 🛠️ Technology Stack
 

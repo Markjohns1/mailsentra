@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from datetime import datetime
 import logging
 import sys
 import os
+from pathlib import Path
+import pandas as pd
 
 from app.database import get_db
 from app.models.spam_log import SpamLog
@@ -54,20 +56,144 @@ def get_retrain_status(
             detail=str(e)
         )
 
+@router.post("/upload-dataset", response_model=Dict[str, Any])
+def upload_dataset(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Upload a CSV dataset file for training"""
+    try:
+        logger.info(f"Dataset upload request from admin {current_user.username}")
+        
+        # Validate file extension
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only CSV files are supported"
+            )
+        
+        # Create dataset directory if it doesn't exist
+        dataset_dir = Path("dataset")
+        dataset_dir.mkdir(exist_ok=True)
+        
+        # Save uploaded file
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_path = dataset_dir / f"uploaded_{timestamp}_{file.filename}"
+        
+        with open(file_path, "wb") as f:
+            content = file.file.read()
+            f.write(content)
+        
+        # Validate CSV structure
+        try:
+            df = pd.read_csv(file_path)
+            
+            # Check required columns
+            required_columns = ['label', 'message'] if 'message' in df.columns else ['label', 'text']
+            if 'label' not in df.columns:
+                os.remove(file_path)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="CSV must have 'label' column. Expected columns: ['label', 'message'] or ['label', 'text']"
+                )
+            
+            text_col = 'message' if 'message' in df.columns else 'text'
+            if text_col not in df.columns:
+                os.remove(file_path)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"CSV must have '{text_col}' column"
+                )
+            
+            # Validate labels
+            valid_labels = {'spam', 'ham'}
+            df['label'] = df['label'].str.lower().str.strip()
+            invalid_labels = set(df['label'].unique()) - valid_labels
+            if invalid_labels:
+                os.remove(file_path)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid labels found: {invalid_labels}. Labels must be 'spam' or 'ham'"
+                )
+            
+            # Get statistics
+            spam_count = (df['label'] == 'spam').sum()
+            ham_count = (df['label'] == 'ham').sum()
+            total_count = len(df)
+            
+            logger.info(f"Dataset uploaded successfully: {total_count} samples ({spam_count} spam, {ham_count} ham)")
+            
+            return {
+                "message": "Dataset uploaded successfully",
+                "file_path": str(file_path),
+                "filename": file.filename,
+                "total_samples": total_count,
+                "spam_samples": int(spam_count),
+                "ham_samples": int(ham_count),
+                "uploaded_at": datetime.now().isoformat()
+            }
+            
+        except pd.errors.EmptyDataError:
+            os.remove(file_path)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="CSV file is empty"
+            )
+        except pd.errors.ParserError as e:
+            os.remove(file_path)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid CSV format: {str(e)}"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Dataset upload failed: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Dataset upload failed: {str(e)}"
+        )
+
+class TrainRequest(BaseModel):
+    dataset_path: Optional[str] = None
+
 @router.post("/train", response_model=RetrainResponse)
 def train_initial_model(
+    request: TrainRequest = TrainRequest(),
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Train model from scratch using the SMS Spam Collection dataset"""
+    """Train model from scratch using a dataset (default: SMS Spam Collection)"""
     try:
         logger.info(f"Initial training request initiated by admin {current_user.username}")
-
+        
+        dataset_path = request.dataset_path if request else None
+        
+        if dataset_path:
+            logger.info(f"Using custom dataset: {dataset_path}")
+            # Validate path exists
+            if not Path(dataset_path).exists():
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Dataset file not found: {dataset_path}"
+                )
+        
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        from train_model import main as train_main
-
-        train_main()
-
+        from train_model import main as train_main, load_dataset, preprocess_dataset, train_model, save_model, get_next_version
+        
+        if dataset_path:
+            # Use custom dataset
+            df = load_dataset(dataset_path)
+            df = preprocess_dataset(df)
+            model, vectorizer, accuracy = train_model(df)
+            model_path, version = save_model(model, vectorizer, accuracy, retrained=False)
+            training_samples = len(df)
+        else:
+            # Use default dataset
+            train_main()
+            training_samples = 5574
+        
         from app.services.model_service import spam_model
         spam_model.load_model()
 
@@ -79,12 +205,15 @@ def train_initial_model(
             training_stats={
                 "accuracy": spam_model.metadata.get('accuracy', 0),
                 "version": str(spam_model.metadata.get('version', 'unknown')),
-                "training_samples": 5574, # 5574 is gotten from the dataset/SMSSpamCollection file in the dataset folder in the backend(spam-detection-api) directory
+                "training_samples": training_samples,
                 "trained_at": datetime.now().isoformat(),
-                "retrained": False
+                "retrained": False,
+                "dataset_path": dataset_path or "default"
             }
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Training failed: {e}", exc_info=True)
         raise HTTPException(
