@@ -30,7 +30,7 @@ const Register = ({ onRegister, loading }) => {
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="space-y-4">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-2">
+          <label htmlFor="username" className="block text-sm font-semibold text-slate-300 mb-2">
             Username
           </label>
           <div className="relative">
@@ -44,7 +44,7 @@ const Register = ({ onRegister, loading }) => {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="block w-full pl-10 pr-3 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition backdrop-blur-sm"
               placeholder="johndoe"
             />
           </div>
@@ -52,7 +52,7 @@ const Register = ({ onRegister, loading }) => {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+          <label htmlFor="email" className="block text-sm font-semibold text-slate-300 mb-2">
             Email Address
           </label>
           <div className="relative">
@@ -67,7 +67,7 @@ const Register = ({ onRegister, loading }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="block w-full pl-10 pr-3 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition backdrop-blur-sm"
               placeholder="you@example.com"
             />
           </div>
@@ -75,7 +75,7 @@ const Register = ({ onRegister, loading }) => {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+          <label htmlFor="password" className="block text-sm font-semibold text-slate-300 mb-2">
             Password
           </label>
           <div className="relative">
@@ -90,7 +90,7 @@ const Register = ({ onRegister, loading }) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="block w-full pl-10 pr-3 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition backdrop-blur-sm"
               placeholder="••••••••"
             />
           </div>
@@ -98,7 +98,7 @@ const Register = ({ onRegister, loading }) => {
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-300 mb-2">
+          <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-300 mb-2">
             Confirm Password
           </label>
           <div className="relative">
@@ -113,7 +113,7 @@ const Register = ({ onRegister, loading }) => {
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="block w-full pl-10 pr-3 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition backdrop-blur-sm"
               placeholder="••••••••"
             />
           </div>
@@ -124,7 +124,7 @@ const Register = ({ onRegister, loading }) => {
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-cyan-500/50 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cyber-glow-hover btn-cyber"
       >
         {loading ? (
           <>

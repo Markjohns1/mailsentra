@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle } from 'lucide-react'
+import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Shield } from 'lucide-react'
 import { LayoutDashboard, Users, FileText, MessageSquare, Cpu } from 'lucide-react'
 
 // Real auth hook - gets actual logged-in user from localStorage
@@ -329,12 +329,17 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+    <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern">
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-950 border-r border-slate-700 transition-all duration-300 flex flex-col`}>
-        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-          {sidebarOpen && <h1 className="text-xl font-bold text-white">MailSentra</h1>}
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-slate-400 hover:text-white">
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-950/90 backdrop-blur-sm border-r border-slate-700/50 transition-all duration-300 flex flex-col shadow-2xl`}>
+        <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
+          {sidebarOpen && (
+            <h1 className="text-xl font-extrabold text-gradient flex items-center gap-2">
+              <Shield className="h-5 w-5 text-cyan-400" />
+              MailSentra
+            </h1>
+          )}
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-slate-400 hover:text-cyan-400 transition-all p-2 rounded-lg hover:bg-slate-800/50">
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -344,10 +349,10 @@ export default function AdminPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all border ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-cyan-500/50 shadow-lg shadow-cyan-500/20'
+                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-cyan-300 border-transparent hover:border-cyan-500/30'
               }`}
             >
               <span className="text-xl">{tab.icon}</span>
@@ -370,30 +375,35 @@ export default function AdminPage() {
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
-            <p className="text-slate-400">System monitoring and management</p>
+          <div className="mb-8 animate-fade-in">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">
+              Admin <span className="text-gradient">Dashboard</span>
+            </h1>
+            <p className="text-slate-400 text-lg flex items-center gap-2">
+              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse-slow"></span>
+              System monitoring and management
+            </p>
           </div>
 
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && metrics && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-6 rounded-xl shadow-xl border border-blue-500/50">
-                  <h3 className="text-sm font-medium text-blue-100 mb-2">Total Scans</h3>
-                  <p className="text-3xl font-bold text-white">{metrics.total_scans.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-cyan-600/20 to-blue-600/20 p-6 rounded-xl shadow-lg border-2 border-cyan-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Total Scans</h3>
+                  <p className="text-4xl font-extrabold text-white">{metrics.total_scans.toLocaleString()}</p>
                 </div>
-                <div className="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-xl shadow-xl border border-red-500/50">
-                  <h3 className="text-sm font-medium text-red-100 mb-2">Spam Detected</h3>
-                  <p className="text-3xl font-bold text-white">{metrics.spam_detected.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-red-600/20 to-rose-600/20 p-6 rounded-xl shadow-lg border-2 border-red-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Spam Detected</h3>
+                  <p className="text-4xl font-extrabold text-white">{metrics.spam_detected.toLocaleString()}</p>
                 </div>
-                <div className="bg-gradient-to-br from-green-600 to-green-700 p-6 rounded-xl shadow-xl border border-green-500/50">
-                  <h3 className="text-sm font-medium text-green-100 mb-2">Total Users</h3>
-                  <p className="text-3xl font-bold text-white">{metrics.total_users.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-green-600/20 to-emerald-600/20 p-6 rounded-xl shadow-lg border-2 border-green-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Total Users</h3>
+                  <p className="text-4xl font-extrabold text-white">{metrics.total_users.toLocaleString()}</p>
                 </div>
-                <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-6 rounded-xl shadow-xl border border-purple-500/50">
-                  <h3 className="text-sm font-medium text-purple-100 mb-2">Accuracy</h3>
-                  <p className="text-3xl font-bold text-white">{Number(metrics.accuracy_rate).toFixed(2)}%</p>
+                <div className="card-cyber bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-6 rounded-xl shadow-lg border-2 border-purple-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Accuracy</h3>
+                  <p className="text-4xl font-extrabold text-white">{Number(metrics.accuracy_rate).toFixed(2)}%</p>
                 </div>
               </div>
 

@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import logging
 from app.database import engine
 from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys, metrics
+from app.config import settings
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -59,7 +60,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

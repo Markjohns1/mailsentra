@@ -59,7 +59,7 @@ const PublicRoute = ({ children }) => {
 function AppRoutes() {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern">
         <Navbar />
         <Routes>
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />

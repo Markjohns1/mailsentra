@@ -44,13 +44,16 @@ const LogsTable = () => {
   }
 
   return (
-    <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-xl">
+    <div className="card-cyber p-6 rounded-xl shadow-2xl animate-fade-in border-purple-500/20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="bg-purple-600/20 p-2 rounded-lg">
+          <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-3 rounded-lg border border-purple-500/30">
             <History className="h-6 w-6 text-purple-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white">Recent Analysis</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-white">Recent Analysis</h2>
+            <p className="text-sm text-slate-400">Activity log</p>
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -58,7 +61,7 @@ const LogsTable = () => {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="px-4 py-2 bg-slate-900/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition backdrop-blur-sm"
           >
             <option value="all">All Results</option>
             <option value="spam">Spam Only</option>
@@ -69,34 +72,36 @@ const LogsTable = () => {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-3 border-cyan-500/30 border-t-cyan-500 mx-auto mb-4"></div>
           <p className="text-slate-400">Loading logs...</p>
         </div>
       ) : logs.length === 0 ? (
         <div className="text-center py-12">
-          <History className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-400 text-lg">No logs found</p>
+          <div className="p-4 bg-slate-800/50 rounded-lg inline-block mb-4">
+            <History className="h-16 w-16 text-slate-600 mx-auto" />
+          </div>
+          <p className="text-slate-400 text-lg font-medium">No logs found</p>
           <p className="text-slate-500 text-sm mt-2">Start analyzing emails to see results here</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-lg border border-slate-700/50">
           <table className="min-w-full">
-            <thead className="bg-slate-700/50">
+            <thead className="bg-slate-900/50 backdrop-blur-sm">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Result</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Confidence</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Feedback</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-700/50">Result</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-700/50">Confidence</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-700/50">Date</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider border-b border-slate-700/50">Feedback</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
+            <tbody className="divide-y divide-slate-800/50">
               {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-700/30 transition-colors">
+                <tr key={log.id} className="hover:bg-slate-800/30 transition-all border-b border-slate-800/30">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${
                       log.result.toLowerCase() === 'spam' 
-                        ? 'bg-red-500/20 text-red-400 border border-red-500/50' 
-                        : 'bg-green-500/20 text-green-400 border border-green-500/50'
+                        ? 'bg-red-500/20 text-red-300 border-2 border-red-500/50 shadow-lg shadow-red-500/10' 
+                        : 'bg-green-500/20 text-green-300 border-2 border-green-500/50 shadow-lg shadow-green-500/10'
                     }`}>
                       {log.result}
                     </span>
@@ -113,23 +118,23 @@ const LogsTable = () => {
                         <button
                           onClick={() => handleFeedback(log.id, 'spam')}
                           disabled={submitting[log.id]}
-                          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg transition-all ${
+                          className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                             submitting[log.id]
-                              ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
-                              : 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50'
+                              ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed border border-slate-600'
+                              : 'bg-red-500/20 text-red-300 hover:bg-red-500/30 border-2 border-red-500/50 hover:shadow-lg hover:shadow-red-500/20'
                           }`}
                           title="Report as spam if misclassified"
                         >
-                          <ThumbsDown className="h-3 w-3" />
+                          <ThumbsDown className="h-3.5 w-3.5" />
                           {submitting[log.id] ? '...' : 'Spam'}
                         </button>
                         <button
                           onClick={() => handleFeedback(log.id, 'not spam')}
                           disabled={submitting[log.id]}
-                          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium rounded-lg transition-all ${
+                          className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                             submitting[log.id]
-                              ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
-                              : 'bg-green-500/20 text-green-400 hover:bg-green-500/30 border border-green-500/50'
+                              ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed border border-slate-600'
+                              : 'bg-green-500/20 text-green-300 hover:bg-green-500/30 border-2 border-green-500/50 hover:shadow-lg hover:shadow-green-500/20'
                           }`}
                           title="Report as not spam if misclassified"
                         >
