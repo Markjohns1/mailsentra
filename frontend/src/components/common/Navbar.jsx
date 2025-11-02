@@ -41,12 +41,13 @@ const Navbar = () => {
                   {user?.username}
                 </span>
                 <button
-                  onClick={logout}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
+  onClick={logout}
+  className="flex items-center gap-2 px-3 py-1.5 text-red-500 hover:text-white hover:bg-red-600 text-sm rounded-md font-medium transition-colors duration-200 border border-transparent hover:border-red-600"
+>
+  <LogOut className="h-4 w-4" />
+  <span className="hidden sm:inline">Logout</span>
+</button>
+
               </>
             ) : (
               <>
