@@ -212,7 +212,10 @@ export default function AdminPage() {
   }
 
   const deleteOldLogs = async (daysOld) => {
-    if (!confirm(`Delete all logs older than ${daysOld} days?`)) return
+    const confirmMsg = daysOld === 0 
+      ? '⚠️ Delete ALL logs immediately? This cannot be undone!'
+      : `Delete all logs older than ${daysOld} day${daysOld === 1 ? '' : 's'}?`
+    if (!confirm(confirmMsg)) return
     try {
       const res = await fetch(`${API_BASE_URL}/admin/bulk/delete-old-logs?days_old=${daysOld}`, {
         method: 'DELETE',
@@ -904,34 +907,114 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Cleanup Tab - keeping original */}
+          {/* Cleanup Tab - Enhanced */}
           {activeTab === 'cleanup' && (
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
-              <h2 className="text-2xl font-bold text-white mb-4">System Cleanup</h2>
-              <p className="text-slate-300 mb-6">Clean up old logs and system data</p>
-              
-              <div className="space-y-4">
-                <button
-                  onClick={() => deleteOldLogs(30)}
-                  className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                >
-                  <Trash2 size={18} />
-                  Delete Logs Older Than 30 Days
-                </button>
-                <button
-                  onClick={() => deleteOldLogs(90)}
-                  className="w-full px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                >
-                  <Trash2 size={18} />
-                  Delete Logs Older Than 90 Days
-                </button>
-                <button
-                  onClick={() => deleteOldLogs(365)}
-                  className="w-full px-4 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                >
-                  <Trash2 size={18} />
-                  Delete Logs Older Than 1 Year
-                </button>
+            <div className="space-y-6 animate-fade-in">
+              <div className="card-cyber rounded-xl shadow-2xl p-6 border-cyan-500/20 backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="bg-gradient-to-br from-cyan-600/20 to-blue-600/20 p-3 rounded-lg border border-cyan-500/30">
+                    <Trash2 className="h-6 w-6 text-cyan-400" size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">System Cleanup</h2>
+                    <p className="text-slate-400 text-sm">Clean up old logs and system data</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Quick Options */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                    <button
+                      onClick={() => {
+                        if (confirm('⚠️ Delete ALL logs immediately? This cannot be undone!')) {
+                          deleteOldLogs(0)
+                        }
+                      }}
+                      className="px-4 py-3 bg-gradient-to-r from-red-600/20 to-rose-600/20 hover:from-red-600/30 hover:to-rose-600/30 text-red-300 border-2 border-red-500/50 hover:border-red-500 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-red-500/20"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                      Delete All Logs
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Delete logs older than 1 day?')) {
+                          deleteOldLogs(1)
+                        }
+                      }}
+                      className="px-4 py-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 hover:from-cyan-600/30 hover:to-blue-600/30 text-cyan-300 border-2 border-cyan-500/50 hover:border-cyan-500 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-cyan-500/20"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                      Delete Logs Older Than 1 Day
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Delete logs older than 7 days?')) {
+                          deleteOldLogs(7)
+                        }
+                      }}
+                      className="px-4 py-3 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 hover:from-blue-600/30 hover:to-indigo-600/30 text-blue-300 border-2 border-blue-500/50 hover:border-blue-500 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/20"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                      Delete Logs Older Than 7 Days
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Delete logs older than 14 days?')) {
+                          deleteOldLogs(14)
+                        }
+                      }}
+                      className="px-4 py-3 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 hover:from-purple-600/30 hover:to-indigo-600/30 text-purple-300 border-2 border-purple-500/50 hover:border-purple-500 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-purple-500/20"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                      Delete Logs Older Than 14 Days
+                    </button>
+                  </div>
+
+                  {/* Custom Days Input */}
+                  <div className="border-t border-slate-700/50 pt-6">
+                    <label className="block text-sm font-semibold text-slate-300 mb-3">
+                      Custom Deletion: Delete logs older than X days
+                    </label>
+                    <div className="flex gap-3">
+                      <input
+                        type="number"
+                        id="customDays"
+                        min="0"
+                        placeholder="Enter days (0 = all logs)"
+                        className="flex-1 px-4 py-3 bg-slate-900/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition backdrop-blur-sm font-mono"
+                      />
+                      <button
+                        onClick={() => {
+                          const input = document.getElementById('customDays')
+                          const days = parseInt(input?.value || '0')
+                          if (isNaN(days) || days < 0) {
+                            showError?.('Please enter a valid number of days (0 or more)')
+                            return
+                          }
+                          if (days === 0) {
+                            if (confirm('⚠️ Delete ALL logs immediately? This cannot be undone!')) {
+                              deleteOldLogs(0)
+                              input.value = ''
+                            }
+                          } else {
+                            if (confirm(`Delete logs older than ${days} days?`)) {
+                              deleteOldLogs(days)
+                              input.value = ''
+                            }
+                          }
+                        }}
+                        className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-cyan-500/50 flex items-center justify-center gap-2 cyber-glow-hover btn-cyber"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                        Delete
+                      </button>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      Enter 0 to delete all logs. Warning: This action cannot be undone.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

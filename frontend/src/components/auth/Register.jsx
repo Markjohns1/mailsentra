@@ -35,7 +35,7 @@ const Register = ({ onRegister, loading }) => {
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <User className="h-5 w-5 text-slate-500" />
+              <User className="h-5 w-5 text-cyan-400" strokeWidth={2} />
             </div>
             <input
               id="username"
@@ -57,7 +57,7 @@ const Register = ({ onRegister, loading }) => {
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-slate-500" />
+              <Mail className="h-5 w-5 text-cyan-400" strokeWidth={2} />
             </div>
             <input
               id="email"
@@ -80,7 +80,7 @@ const Register = ({ onRegister, loading }) => {
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-slate-500" />
+              <Lock className="h-5 w-5 text-cyan-400" strokeWidth={2} />
             </div>
             <input
               id="password"
@@ -103,7 +103,7 @@ const Register = ({ onRegister, loading }) => {
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-slate-500" />
+              <Lock className="h-5 w-5 text-cyan-400" strokeWidth={2} />
             </div>
             <input
               id="confirmPassword"
@@ -133,7 +133,7 @@ const Register = ({ onRegister, loading }) => {
           </>
         ) : (
           <>
-            <UserPlus className="h-5 w-5" />
+            <UserPlus className="h-5 w-5 text-white" strokeWidth={2.5} />
             <span>Create Account</span>
           </>
         )}

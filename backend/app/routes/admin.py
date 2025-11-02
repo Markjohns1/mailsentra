@@ -898,24 +898,32 @@ def deactivate_inactive_users(
 
 @router.delete("/bulk/delete-old-logs")
 def delete_old_logs(
-    days_old: int = Query(365, ge=30),
+    days_old: int = Query(0, ge=0),
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
-    """Delete spam logs older than X days"""
+    """Delete spam logs older than X days (0 = delete all logs)"""
     try:
-        cutoff_date = datetime.utcnow() - timedelta(days=days_old)
-
-        count = db.query(SpamLog).filter(SpamLog.created_at < cutoff_date).count()
-
-        db.query(SpamLog).filter(SpamLog.created_at < cutoff_date).delete()
-        db.commit()
-
-        return {
-            "message": f"Deleted {count} old spam logs",
-            "days_threshold": days_old,
-            "cutoff_date": cutoff_date.isoformat()
-        }
+        if days_old == 0:
+            # Delete all logs
+            count = db.query(SpamLog).count()
+            db.query(SpamLog).delete()
+            db.commit()
+            return {
+                "message": f"Deleted all {count} spam logs",
+                "days_threshold": 0,
+                "cutoff_date": None
+            }
+        else:
+            cutoff_date = datetime.utcnow() - timedelta(days=days_old)
+            count = db.query(SpamLog).filter(SpamLog.created_at < cutoff_date).count()
+            db.query(SpamLog).filter(SpamLog.created_at < cutoff_date).delete()
+            db.commit()
+            return {
+                "message": f"Deleted {count} old spam logs",
+                "days_threshold": days_old,
+                "cutoff_date": cutoff_date.isoformat()
+            }
     except Exception as e:
         db.rollback()
         raise HTTPException(

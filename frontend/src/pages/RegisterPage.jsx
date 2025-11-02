@@ -56,7 +56,7 @@ const RegisterPage = () => {
           
           <div className="mt-6 pt-6 border-t border-slate-700/50 text-center">
             <p className="text-xs text-slate-500 flex items-center justify-center gap-2">
-              <Shield className="h-3 w-3 text-cyan-400/70" />
+              <Shield className="h-3 w-3 text-cyan-400" strokeWidth={2.5} />
               By creating an account, you agree to our Terms of Service
             </p>
           </div>
