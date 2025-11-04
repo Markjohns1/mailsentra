@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine
-from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys, metrics, model_info
+from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys, metrics, model_info, training
 from app.config import settings
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
@@ -75,6 +75,8 @@ app.include_router(retrain.router, prefix="/api/retrain", tags=["Retraining"])
 app.include_router(api_keys.router, prefix="/api/token", tags=["API Keys"])
 app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
 app.include_router(model_info.router, prefix="/api/model", tags=["Model Management"])
+app.include_router(training.router, prefix="/api/training", tags=["training"])
+app.include_router(training.router, prefix="/api/admin", tags=["admin-training"])
 
 @app.get("/")
 def read_root():

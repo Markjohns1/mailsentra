@@ -1,0 +1,466 @@
+﻿from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from pydantic import BaseModel
+from datetime import datetime
+
+from app.database import get_db
+from app.models.training import TrainingSection, TrainingExample, TrainingQuiz, TrainingTip
+from app.models.user import User
+from app.dependencies import get_current_user, get_current_admin_user
+
+router = APIRouter()
+
+# ==================== SCHEMAS ====================
+
+class TrainingExampleSchema(BaseModel):
+    id: Optional[int] = None
+    type: str  # 'spam' or 'ham'
+    subject: Optional[str] = None
+    content: str
+    analysis: Optional[str] = None
+    order: int = 1
+
+    class Config:
+        from_attributes = True
+
+
+class TrainingQuizSchema(BaseModel):
+    id: Optional[int] = None
+    question: str
+    correct_answer: str  # 'spam' or 'ham'
+    explanation: Optional[str] = None
+    order: int = 1
+
+    class Config:
+        from_attributes = True
+
+
+class TrainingTipSchema(BaseModel):
+    id: Optional[int] = None
+    title: str
+    description: str
+    icon: str = "mail"
+    order: int = 1
+
+    class Config:
+        from_attributes = True
+
+
+class TrainingSectionSchema(BaseModel):
+    id: Optional[int] = None
+    title: str
+    icon: str = "mail"
+    order: int = 1
+    content: str
+    is_active: bool = True
+    examples: List[TrainingExampleSchema] = []
+    quiz: List[TrainingQuizSchema] = []
+    tips: List[TrainingTipSchema] = []
+
+    class Config:
+        from_attributes = True
+
+
+class TrainingSectionCreateSchema(BaseModel):
+    title: str
+    icon: str = "mail"
+    order: int = 1
+    content: str
+    examples: List[TrainingExampleSchema] = []
+    quiz: List[TrainingQuizSchema] = []
+    tips: List[TrainingTipSchema] = []
+
+
+class TrainingSectionUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    icon: Optional[str] = None
+    order: Optional[int] = None
+    content: Optional[str] = None
+    is_active: Optional[bool] = None
+    examples: Optional[List[TrainingExampleSchema]] = None
+    quiz: Optional[List[TrainingQuizSchema]] = None
+    tips: Optional[List[TrainingTipSchema]] = None
+
+
+# ==================== PUBLIC ENDPOINTS ====================
+
+@router.get("/content")
+def get_training_content(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all active training content (available to all authenticated users)
+    """
+    sections = db.query(TrainingSection).filter(
+        TrainingSection.is_active == True
+    ).order_by(TrainingSection.order).all()
+
+    result = {
+        "sections": []
+    }
+
+    for section in sections:
+        section_data = {
+            "id": section.id,
+            "title": section.title,
+            "icon": section.icon,
+            "order": section.order,
+            "content": section.content,
+            "examples": [
+                {
+                    "id": ex.id,
+                    "type": ex.type,
+                    "subject": ex.subject,
+                    "content": ex.content,
+                    "analysis": ex.analysis
+                }
+                for ex in sorted(section.examples, key=lambda x: x.order)
+            ],
+            "quiz": [
+                {
+                    "id": q.id,
+                    "question": q.question,
+                    "correctAnswer": q.correct_answer,
+                    "explanation": q.explanation
+                }
+                for q in sorted(section.quiz_questions, key=lambda x: x.order)
+            ],
+            "tips": [
+                {
+                    "title": t.title,
+                    "description": t.description,
+                    "icon": t.icon
+                }
+                for t in sorted(section.tips, key=lambda x: x.order)
+            ]
+        }
+        result["sections"].append(section_data)
+
+    return result
+
+
+# ==================== ADMIN ENDPOINTS ====================
+
+@router.get("/admin/training/content")
+def get_admin_training_content(
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all training content including inactive (admin only)
+    """
+    sections = db.query(TrainingSection).order_by(TrainingSection.order).all()
+
+    result = {
+        "sections": []
+    }
+
+    for section in sections:
+        section_data = {
+            "id": section.id,
+            "title": section.title,
+            "icon": section.icon,
+            "order": section.order,
+            "content": section.content,
+            "is_active": section.is_active,
+            "examples": [
+                {
+                    "id": ex.id,
+                    "type": ex.type,
+                    "subject": ex.subject,
+                    "content": ex.content,
+                    "analysis": ex.analysis,
+                    "order": ex.order
+                }
+                for ex in sorted(section.examples, key=lambda x: x.order)
+            ],
+            "quiz": [
+                {
+                    "id": q.id,
+                    "question": q.question,
+                    "correctAnswer": q.correct_answer,
+                    "explanation": q.explanation,
+                    "order": q.order
+                }
+                for q in sorted(section.quiz_questions, key=lambda x: x.order)
+            ],
+            "tips": [
+                {
+                    "title": t.title,
+                    "description": t.description,
+                    "icon": t.icon,
+                    "order": t.order
+                }
+                for t in sorted(section.tips, key=lambda x: x.order)
+            ]
+        }
+        result["sections"].append(section_data)
+
+    return result
+
+
+@router.post("/admin/training/sections", status_code=status.HTTP_201_CREATED)
+def create_training_section(
+    section_data: TrainingSectionCreateSchema,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new training section (admin only)
+    """
+    # Create section
+    new_section = TrainingSection(
+        title=section_data.title,
+        icon=section_data.icon,
+        order=section_data.order,
+        content=section_data.content
+    )
+    db.add(new_section)
+    db.flush()  # Get the ID
+
+    # Add examples
+    for idx, example in enumerate(section_data.examples):
+        db_example = TrainingExample(
+            section_id=new_section.id,
+            type=example.type,
+            subject=example.subject,
+            content=example.content,
+            analysis=example.analysis,
+            order=example.order or idx + 1
+        )
+        db.add(db_example)
+
+    # Add quiz questions
+    for idx, question in enumerate(section_data.quiz):
+        db_question = TrainingQuiz(
+            section_id=new_section.id,
+            question=question.question,
+            correct_answer=question.correct_answer,
+            explanation=question.explanation,
+            order=question.order or idx + 1
+        )
+        db.add(db_question)
+
+    # Add tips
+    for idx, tip in enumerate(section_data.tips):
+        db_tip = TrainingTip(
+            section_id=new_section.id,
+            title=tip.title,
+            description=tip.description,
+            icon=tip.icon,
+            order=tip.order or idx + 1
+        )
+        db.add(db_tip)
+
+    db.commit()
+    db.refresh(new_section)
+
+    return {
+        "message": "Training section created successfully",
+        "section_id": new_section.id
+    }
+
+
+@router.put("/admin/training/sections/{section_id}")
+def update_training_section(
+    section_id: int,
+    section_data: TrainingSectionUpdateSchema,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update a training section (admin only)
+    """
+    section = db.query(TrainingSection).filter(TrainingSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Training section not found")
+
+    # Update basic fields
+    if section_data.title is not None:
+        section.title = section_data.title
+    if section_data.icon is not None:
+        section.icon = section_data.icon
+    if section_data.order is not None:
+        section.order = section_data.order
+    if section_data.content is not None:
+        section.content = section_data.content
+    if section_data.is_active is not None:
+        section.is_active = section_data.is_active
+
+    section.updated_at = datetime.utcnow()
+
+    # Update examples if provided
+    if section_data.examples is not None:
+        # Delete old examples
+        db.query(TrainingExample).filter(TrainingExample.section_id == section_id).delete()
+        # Add new examples
+        for idx, example in enumerate(section_data.examples):
+            db_example = TrainingExample(
+                section_id=section_id,
+                type=example.type,
+                subject=example.subject,
+                content=example.content,
+                analysis=example.analysis,
+                order=example.order or idx + 1
+            )
+            db.add(db_example)
+
+    # Update quiz if provided
+    if section_data.quiz is not None:
+        # Delete old quiz questions
+        db.query(TrainingQuiz).filter(TrainingQuiz.section_id == section_id).delete()
+        # Add new questions
+        for idx, question in enumerate(section_data.quiz):
+            db_question = TrainingQuiz(
+                section_id=section_id,
+                question=question.question,
+                correct_answer=question.correct_answer,
+                explanation=question.explanation,
+                order=question.order or idx + 1
+            )
+            db.add(db_question)
+
+    # Update tips if provided
+    if section_data.tips is not None:
+        # Delete old tips
+        db.query(TrainingTip).filter(TrainingTip.section_id == section_id).delete()
+        # Add new tips
+        for idx, tip in enumerate(section_data.tips):
+            db_tip = TrainingTip(
+                section_id=section_id,
+                title=tip.title,
+                description=tip.description,
+                icon=tip.icon,
+                order=tip.order or idx + 1
+            )
+            db.add(db_tip)
+
+    db.commit()
+
+    return {
+        "message": "Training section updated successfully",
+        "section_id": section_id
+    }
+
+
+@router.delete("/admin/training/sections/{section_id}")
+def delete_training_section(
+    section_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a training section (admin only)
+    """
+    section = db.query(TrainingSection).filter(TrainingSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Training section not found")
+
+    db.delete(section)
+    db.commit()
+
+    return {
+        "message": "Training section deleted successfully",
+        "section_id": section_id
+    }
+
+
+# ==================== EXAMPLE MANAGEMENT ====================
+
+@router.post("/admin/training/sections/{section_id}/examples", status_code=status.HTTP_201_CREATED)
+def add_example(
+    section_id: int,
+    example: TrainingExampleSchema,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Add an example to a section (admin only)
+    """
+    section = db.query(TrainingSection).filter(TrainingSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Training section not found")
+
+    db_example = TrainingExample(
+        section_id=section_id,
+        type=example.type,
+        subject=example.subject,
+        content=example.content,
+        analysis=example.analysis,
+        order=example.order
+    )
+    db.add(db_example)
+    db.commit()
+    db.refresh(db_example)
+
+    return {"message": "Example added successfully", "example_id": db_example.id}
+
+
+@router.delete("/admin/training/examples/{example_id}")
+def delete_example(
+    example_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete an example (admin only)
+    """
+    example = db.query(TrainingExample).filter(TrainingExample.id == example_id).first()
+    if not example:
+        raise HTTPException(status_code=404, detail="Example not found")
+
+    db.delete(example)
+    db.commit()
+
+    return {"message": "Example deleted successfully"}
+
+
+# ==================== QUIZ MANAGEMENT ====================
+
+@router.post("/admin/training/sections/{section_id}/quiz", status_code=status.HTTP_201_CREATED)
+def add_quiz_question(
+    section_id: int,
+    question: TrainingQuizSchema,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Add a quiz question to a section (admin only)
+    """
+    section = db.query(TrainingSection).filter(TrainingSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Training section not found")
+
+    db_question = TrainingQuiz(
+        section_id=section_id,
+        question=question.question,
+        correct_answer=question.correct_answer,
+        explanation=question.explanation,
+        order=question.order
+    )
+    db.add(db_question)
+    db.commit()
+    db.refresh(db_question)
+
+    return {"message": "Quiz question added successfully", "question_id": db_question.id}
+
+
+@router.delete("/admin/training/quiz/{question_id}")
+def delete_quiz_question(
+    question_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a quiz question (admin only)
+    """
+    question = db.query(TrainingQuiz).filter(TrainingQuiz.id == question_id).first()
+    if not question:
+        raise HTTPException(status_code=404, detail="Quiz question not found")
+
+    db.delete(question)
+    db.commit()
+
+    return {"message": "Quiz question deleted successfully"}

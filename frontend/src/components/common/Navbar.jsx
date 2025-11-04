@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Shield, LogOut, LayoutDashboard, Settings } from 'lucide-react'
+import { Shield, LogOut, LayoutDashboard, Settings, BookOpen } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const Navbar = () => {
@@ -29,6 +29,16 @@ const Navbar = () => {
                   <LayoutDashboard className="h-4 w-4" />
                   <span className="hidden sm:inline font-medium">Dashboard</span>
                 </Link>
+                
+                {/* NEW: Security Training Link - Available to ALL users */}
+                <Link
+                  to="/training"
+                  className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-green-400 hover:bg-slate-700/50 rounded-lg transition-all border border-transparent hover:border-green-500/30"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline font-medium">Training</span>
+                </Link>
+                
                 {user?.is_admin && (
                   <Link
                     to="/admin"

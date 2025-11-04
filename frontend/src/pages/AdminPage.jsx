@@ -1,3 +1,4 @@
+import TrainingContentManager from '../components/dashboard/TrainingContentManager'
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Shield, Upload, FileText as FileTextIcon, BookOpen } from 'lucide-react'
@@ -13,6 +14,7 @@ const useToast = () => ({
   showError: (msg) => alert('Error: ' + msg),
   showSuccess: (msg) => alert('Success: ' + msg)
 })
+
 
 const API_BASE_URL = 'http://localhost:8000/api'
 
@@ -365,14 +367,15 @@ export default function AdminPage() {
     }
   }
 
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'users', label: 'Users', icon: <Users size={20} /> },
-    { id: 'logs', label: 'Logs', icon: <FileText size={20} /> },
-    { id: 'feedback', label: 'Feedback', icon: <MessageSquare size={20} /> },
-    { id: 'model', label: 'Model', icon: <Cpu size={20} /> },
-    { id: 'cleanup', label: 'Cleanup', icon: <Trash2 size={20} /> }
-  ]
+const tabs = [
+  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+  { id: 'users', label: 'Users', icon: <Users size={20} /> },
+  { id: 'logs', label: 'Logs', icon: <FileText size={20} /> },
+  { id: 'feedback', label: 'Feedback', icon: <MessageSquare size={20} /> },
+  { id: 'model', label: 'Model', icon: <Cpu size={20} /> },
+  { id: 'cleanup', label: 'Cleanup', icon: <Trash2 size={20} /> },
+  { id: 'training', label: 'Training Content', icon: <BookOpen size={20} /> }  // ADD THIS LINE
+]
 
   const chartData = [
     { name: 'Spam', value: metrics?.spam_detected || 0 },
@@ -1182,6 +1185,11 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+{activeTab === 'training' && (
+            <div className="animate-fade-in">
+              <TrainingContentManager />
             </div>
           )}
         </div>
