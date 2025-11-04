@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 from app.database import engine
-from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys, metrics
+from app.routes import auth, user, preprocessing, analyze, logs, feedback, admin, retrain, api_keys, metrics, model_info
 from app.config import settings
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
@@ -23,16 +23,13 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     logger.info("Starting up Spam Detection API...")
-    
     if not spam_model.is_loaded:
-        logger.warning(" Model not loaded! Run 'python train_model.py' first")
+        logger.warning("Model not loaded! Run 'python train_model.py' first")
     else:
         logger.info("Spam detection model ready")
         logger.info(f"   - Version: {spam_model.metadata.get('version', 'unknown')}")
         logger.info(f"   - Accuracy: {spam_model.metadata.get('accuracy', 0) * 100:.2f}%")
-    
     yield
-    
     logger.info("Shutting down Spam Detection API...")
 
 app = FastAPI(
@@ -66,6 +63,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include all routers AFTER app is created
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(user.router, prefix="/api/user", tags=["User"])
 app.include_router(preprocessing.router, prefix="/api/preprocessing", tags=["Preprocessing"])
@@ -76,6 +74,7 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(retrain.router, prefix="/api/retrain", tags=["Retraining"])
 app.include_router(api_keys.router, prefix="/api/token", tags=["API Keys"])
 app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
+app.include_router(model_info.router, prefix="/api/model", tags=["Model Management"])
 
 @app.get("/")
 def read_root():

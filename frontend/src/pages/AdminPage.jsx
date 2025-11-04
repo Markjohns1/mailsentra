@@ -3,7 +3,6 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Shield, Upload, FileText as FileTextIcon, BookOpen } from 'lucide-react'
 import { LayoutDashboard, Users, FileText, MessageSquare, Cpu } from 'lucide-react'
 
-// Real auth hook - gets actual logged-in user from localStorage
 const useAuth = () => {
   const userStr = localStorage.getItem('user')
   const user = userStr ? JSON.parse(userStr) : null
@@ -16,6 +15,7 @@ const useToast = () => ({
 })
 
 const API_BASE_URL = 'http://localhost:8000/api'
+
 export default function AdminPage() {
   const { user } = useAuth() || {}
   const { showError, showSuccess } = useToast() || {}
@@ -31,7 +31,7 @@ export default function AdminPage() {
   const [editingUser, setEditingUser] = useState(null)
   const [editForm, setEditForm] = useState({})
   const [viewingFeedback, setViewingFeedback] = useState(null)
-  const [feedbackFilter, setFeedbackFilter] = useState('all') // all, misclassified, correct
+  const [feedbackFilter, setFeedbackFilter] = useState('all')
   const [uploadedDataset, setUploadedDataset] = useState(null)
   const [uploadingDataset, setUploadingDataset] = useState(false)
 
@@ -123,7 +123,6 @@ export default function AdminPage() {
   const loadRetrainStatus = async () => {
     setLoading(true)
     try {
-      // FIXED: Changed from /admin/retrain/status to /retrain/status
       const res = await fetch(`${API_BASE_URL}/retrain/status`, { headers: getHeaders() })
       if (!res.ok) {
         const errorData = await res.json()
@@ -143,7 +142,6 @@ export default function AdminPage() {
     if (!confirm('Retrain model with user feedback? This will take a few minutes.')) return
     setRetraining(true)
     try {
-      // FIXED: Changed from /admin/retrain to /retrain
       const res = await fetch(`${API_BASE_URL}/retrain`, {
         method: 'POST',
         headers: getHeaders()
@@ -176,9 +174,15 @@ export default function AdminPage() {
     formData.append('file', file)
     
     try {
+      const token = localStorage.getItem('token')
+      const headers = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      
       const res = await fetch(`${API_BASE_URL}/retrain/upload-dataset`, {
         method: 'POST',
-        headers: getHeaders(false), // No Content-Type for FormData - browser sets it with boundary
+        headers: headers,
         body: formData
       })
       
@@ -199,35 +203,51 @@ export default function AdminPage() {
   }
 
   const triggerInitialTrain = async (customDatasetPath = null) => {
+    console.log('🚀 triggerInitialTrain called')
     const msg = customDatasetPath 
       ? `Train model with uploaded dataset? This will take a few minutes.`
       : `Train model from scratch? This will take a few minutes.`
-    if (!confirm(msg)) return
+    if (!confirm(msg)) {
+      console.log('❌ User cancelled')
+      return
+    }
     
+    console.log('✅ Starting training...')
     setRetraining(true)
     try {
-      const body = customDatasetPath ? JSON.stringify({ dataset_path: customDatasetPath }) : null
+      const token = localStorage.getItem('token')
+      const headers = {
+        'Content-Type': 'application/json'
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+      
+      const body = customDatasetPath ? { dataset_path: customDatasetPath } : null
+      
       const res = await fetch(`${API_BASE_URL}/retrain/train`, {
         method: 'POST',
-        headers: {
-          ...getHeaders(),
-          'Content-Type': 'application/json'
-        },
-        body: body
+        headers: headers,
+        body: body ? JSON.stringify(body) : null
       })
+      
+      console.log('📥 Response status:', res.status)
+      
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.detail || 'Training failed')
       }
       const data = await res.json()
+      console.log('✅ Training complete')
       showSuccess?.(`Model trained! Accuracy: ${(data.training_stats.accuracy * 100).toFixed(2)}%`)
-      setUploadedDataset(null) // Reset after successful training
+      setUploadedDataset(null)
       loadRetrainStatus()
       loadMetrics()
     } catch (e) {
+      console.error('💥 Training error:', e)
       showError?.('Training Error: ' + String(e))
-      console.error('Full error:', e)
     } finally {
+      console.log('🏁 Setting retraining to false')
       setRetraining(false)
     }
   }
@@ -382,7 +402,6 @@ export default function AdminPage() {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern">
-      {/* Sidebar */}
       <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-950/90 backdrop-blur-sm border-r border-slate-700/50 transition-all duration-300 flex flex-col shadow-2xl`}>
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           {sidebarOpen && (
@@ -423,10 +442,8 @@ export default function AdminPage() {
         )}
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-7xl mx-auto">
-          {/* Header */}
           <div className="mb-8 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">
               Admin <span className="text-gradient">Dashboard</span>
@@ -437,7 +454,6 @@ export default function AdminPage() {
             </p>
           </div>
 
-          {/* Dashboard Tab */}
           {activeTab === 'dashboard' && metrics && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -492,7 +508,6 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Users Tab - keeping original implementation */}
           {activeTab === 'users' && (
             <div className="space-y-6">
               {editingUser ? (
@@ -619,7 +634,6 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Logs Tab - keeping original */}
           {activeTab === 'logs' && (
             <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
               <div className="px-6 py-4 border-b border-slate-700">
@@ -660,10 +674,8 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* ENHANCED Feedback Tab */}
           {activeTab === 'feedback' && (
             <div className="space-y-6">
-              {/* Feedback Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
                   <h3 className="text-sm text-slate-400 mb-2">Total Feedback</h3>
@@ -680,7 +692,6 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* Feedback Detail Modal */}
               {viewingFeedback && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
                   <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-2xl w-full max-h-[80vh] overflow-auto">
@@ -732,7 +743,6 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* Feedback Table */}
               <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
                   <h2 className="text-xl font-bold text-white">User Feedback</h2>
@@ -833,7 +843,6 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* ENHANCED Model Tab */}
           {activeTab === 'model' && (
             <div className="space-y-6">
               <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/50 p-8 rounded-xl">
@@ -868,7 +877,6 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* Dataset Upload Section */}
                 <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 mb-6">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-cyan-500/20 rounded-lg border border-cyan-500/30">
@@ -1068,7 +1076,6 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Cleanup Tab - Enhanced */}
           {activeTab === 'cleanup' && (
             <div className="space-y-6 animate-fade-in">
               <div className="card-cyber rounded-xl shadow-2xl p-6 border-cyan-500/20 backdrop-blur-sm">
@@ -1083,7 +1090,6 @@ export default function AdminPage() {
                 </div>
                 
                 <div className="space-y-3">
-                  {/* Quick Options */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                     <button
                       onClick={() => {
@@ -1131,7 +1137,6 @@ export default function AdminPage() {
                     </button>
                   </div>
 
-                  {/* Custom Days Input */}
                   <div className="border-t border-slate-700/50 pt-6">
                     <label className="block text-sm font-semibold text-slate-300 mb-3">
                       Custom Deletion: Delete logs older than X days
