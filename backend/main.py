@@ -75,8 +75,7 @@ app.include_router(retrain.router, prefix="/api/retrain", tags=["Retraining"])
 app.include_router(api_keys.router, prefix="/api/token", tags=["API Keys"])
 app.include_router(metrics.router, prefix="/api/metrics", tags=["Metrics"])
 app.include_router(model_info.router, prefix="/api/model", tags=["Model Management"])
-app.include_router(training.router, prefix="/api/training", tags=["training"])
-app.include_router(training.router, prefix="/api/admin", tags=["admin-training"])
+app.include_router(training.router, prefix="/api", tags=["training"])
 
 @app.get("/")
 def read_root():
