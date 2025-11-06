@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
+import re
 from app.database import get_db
 from app.models.user import User
 from app.utils.security import verify_password, get_password_hash, create_access_token
@@ -50,11 +51,18 @@ def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
             detail="Email already registered!"
         )
 
-    # Validate password length
+    # Validate password length and strength
     if len(user_data.password) < 8:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Password must be at least 8 characters"
+        )
+    
+    # Validate username (alphanumeric and underscore only)
+    if not re.match(r'^[a-zA-Z0-9_]{3,50}$', user_data.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username must be 3-50 characters, alphanumeric with underscores only"
         )
 
     # Create new user

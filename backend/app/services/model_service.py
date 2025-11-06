@@ -13,12 +13,18 @@ from app.services.preprocessing import email_preprocessor
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class SpamDetectionModel: # SpamDetectionModel is a class that handles the model loading and predictions
+class SpamDetectionModel:
     """
     Spam detection model service
     Handles model loading and predictions
-    """
-    #how does this prediction work? it works by loading the model from the disk and then using the model to predict the spam or not spam by 
+    
+    The prediction process works by:
+    1. Loading the trained model from disk (pickle file)
+    2. Preprocessing the input email text
+    3. Vectorizing the preprocessed text using TF-IDF
+    4. Running the model prediction to classify as spam or ham
+    5. Returning confidence scores and metadata
+    """ 
     def __init__(self, model_path: str = "ml_models/spam_model.pkl"):
         """
         Initialize the model service
@@ -46,8 +52,8 @@ class SpamDetectionModel: # SpamDetectionModel is a class that handles the model
             model_file = Path(self.model_path)
             
             if not model_file.exists():
-                logger.warning(f"⚠️  Model file not found: {self.model_path}")
-                logger.info("💡 Run 'python train_model.py' to train the model first")
+                logger.warning(f"Model file not found: {self.model_path}")
+                logger.info("Run 'python train_model.py' to train the model first")
                 return False
             
             # Load model
@@ -67,7 +73,7 @@ class SpamDetectionModel: # SpamDetectionModel is a class that handles the model
             return True
             
         except Exception as e:
-            logger.error(f" Error loading model: {e}")
+            logger.error(f"Error loading model: {e}")
             self.is_loaded = False
             return False
     
@@ -82,7 +88,7 @@ class SpamDetectionModel: # SpamDetectionModel is a class that handles the model
             Dictionary with prediction results
         """
         if not self.is_loaded:
-            logger.error(" Model not loaded. Cannot make predictions.")
+            logger.error("Model not loaded. Cannot make predictions.")
             return {
                 "error": "Model not loaded",
                 "result": "unknown",
@@ -95,7 +101,7 @@ class SpamDetectionModel: # SpamDetectionModel is a class that handles the model
             processed_text = preprocessed['final_processed_text']
             
             if not processed_text or processed_text.strip() == "":
-                logger.warning("⚠️  Empty text after preprocessing")
+                logger.warning("Empty text after preprocessing")
                 return {
                     "result": "ham",
                     "confidence": 0.5,
@@ -117,7 +123,7 @@ class SpamDetectionModel: # SpamDetectionModel is a class that handles the model
             # Determine result
             result = "spam" if prediction == "spam" else "ham"
             
-            logger.info(f" Prediction: {result.upper()} (confidence: {confidence * 100:.2f}%)")
+            logger.info(f"Prediction: {result.upper()} (confidence: {confidence * 100:.2f}%)")
             
             return {
                 "result": result,
@@ -160,4 +166,5 @@ class SpamDetectionModel: # SpamDetectionModel is a class that handles the model
         }
 
 # Create global model instance
-spam_model = SpamDetectionModel() # spam_model is a global model instance that is used to predict the spam or not spam by the SpamDetectionModel class.
+# This singleton instance is loaded once at startup and reused for all predictions
+spam_model = SpamDetectionModel()

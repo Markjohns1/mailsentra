@@ -36,9 +36,13 @@ export default function AdminPage() {
   const [feedbackFilter, setFeedbackFilter] = useState('all')
   const [uploadedDataset, setUploadedDataset] = useState(null)
   const [uploadingDataset, setUploadingDataset] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
 
   useEffect(() => {
     loadMetrics()
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {
@@ -405,7 +409,7 @@ const tabs = [
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern">
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-950/90 backdrop-blur-sm border-r border-slate-700/50 transition-all duration-300 flex flex-col shadow-2xl`}>
+      <div className={`${isMobile ? (sidebarOpen ? 'fixed inset-0 z-50 w-64' : 'hidden') : (sidebarOpen ? 'w-64' : 'w-20')} bg-slate-950/90 backdrop-blur-sm border-r border-slate-700/50 transition-all duration-300 flex flex-col shadow-2xl`}>
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           {sidebarOpen && (
             <h1 className="text-xl font-extrabold text-gradient flex items-center gap-2">
@@ -448,10 +452,10 @@ const tabs = [
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-7xl mx-auto">
           <div className="mb-8 animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3">
               Admin <span className="text-gradient">Dashboard</span>
             </h1>
-            <p className="text-slate-400 text-lg flex items-center gap-2">
+            <p className="text-slate-400 text-sm sm:text-base md:text-lg flex items-center gap-2">
               <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse-slow"></span>
               System monitoring and management
             </p>
@@ -460,30 +464,39 @@ const tabs = [
           {activeTab === 'dashboard' && metrics && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="card-cyber bg-gradient-to-br from-cyan-600/20 to-blue-600/20 p-6 rounded-xl shadow-lg border-2 border-cyan-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Total Scans</h3>
-                  <p className="text-4xl font-extrabold text-white">{metrics.total_scans.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-cyan-600/20 to-blue-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-cyan-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Total Scans</h3>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{metrics.total_scans.toLocaleString()}</p>
                 </div>
-                <div className="card-cyber bg-gradient-to-br from-red-600/20 to-rose-600/20 p-6 rounded-xl shadow-lg border-2 border-red-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Spam Detected</h3>
-                  <p className="text-4xl font-extrabold text-white">{metrics.spam_detected.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-red-600/20 to-rose-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-red-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Spam Detected</h3>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{metrics.spam_detected.toLocaleString()}</p>
                 </div>
-                <div className="card-cyber bg-gradient-to-br from-green-600/20 to-emerald-600/20 p-6 rounded-xl shadow-lg border-2 border-green-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Total Users</h3>
-                  <p className="text-4xl font-extrabold text-white">{metrics.total_users.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-green-600/20 to-emerald-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-green-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Total Users</h3>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{metrics.total_users.toLocaleString()}</p>
                 </div>
-                <div className="card-cyber bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-6 rounded-xl shadow-lg border-2 border-purple-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Accuracy</h3>
-                  <p className="text-4xl font-extrabold text-white">{Number(metrics.accuracy_rate).toFixed(2)}%</p>
+                <div className="card-cyber bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-purple-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Accuracy</h3>
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{Number(metrics.accuracy_rate).toFixed(2)}%</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700">
-                  <h3 className="text-lg font-semibold text-white mb-4">Spam vs Ham</h3>
-                  <ResponsiveContainer width="100%" height={300}>
+                <div className="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-xl border border-slate-700">
+                  <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Spam vs Ham</h3>
+                  <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
                     <PieChart>
-                      <Pie data={chartData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#8884d8" dataKey="value">
+                      <Pie 
+                        data={chartData} 
+                        cx="50%" 
+                        cy="50%" 
+                        labelLine={false} 
+                        label={isMobile ? false : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} 
+                        outerRadius={isMobile ? 50 : 80} 
+                        fill="#8884d8" 
+                        dataKey="value"
+                      >
                         {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index]} />)}
                       </Pie>
                       <Tooltip />
@@ -586,6 +599,41 @@ const tabs = [
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
+                      {isMobile ? (
+                        <div className="space-y-4 p-4">
+                          {users.map((u) => (
+                            <div key={u.id} className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <p className="font-semibold text-white">{u.username}</p>
+                                  <p className="text-sm text-slate-400">{u.email}</p>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button onClick={() => openEditUser(u)} className="p-2 hover:bg-slate-700 rounded text-blue-400">
+                                    <Edit2 size={16} />
+                                  </button>
+                                  <button onClick={() => toggleUserStatus(u.id, u.is_active)} className="p-2 hover:bg-slate-700 rounded text-yellow-400">
+                                    <Power size={16} />
+                                  </button>
+                                  {u.id !== user?.id && (
+                                    <button onClick={() => deleteUser(u.id)} className="p-2 hover:bg-slate-700 rounded text-red-400">
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex gap-2 mt-2">
+                                <span className={`px-2 py-1 text-xs rounded ${u.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                  {u.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                                <span className={`px-2 py-1 text-xs rounded ${u.is_admin ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-500/20 text-slate-400'}`}>
+                                  {u.is_admin ? 'Admin' : 'User'}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
                       <table className="w-full">
                         <thead className="bg-slate-700/50">
                           <tr>
@@ -630,6 +678,7 @@ const tabs = [
                           ))}
                         </tbody>
                       </table>
+                      )}
                     </div>
                   )}
                 </div>

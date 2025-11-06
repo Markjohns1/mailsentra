@@ -7,6 +7,7 @@ from app.models.spam_log import SpamLog
 from app.services.model_service import spam_model
 from app.dependencies import get_current_user
 from app.models.user import User
+from app.utils.sanitize import sanitize_email_text
 from datetime import datetime
 import logging
 
@@ -67,15 +68,19 @@ def analyze_email(
         confidence = prediction_result.get("confidence", 0.0)
         is_spam = result == "spam"
         
+        # Sanitize and limit email text for storage
+        sanitized_text = sanitize_email_text(request.email_text)
+        stored_text = sanitized_text[:500] if len(sanitized_text) > 500 else sanitized_text
+        
         # Log the analysis result to database
         spam_log = SpamLog(
             user_id=current_user.id,
             email_id=request.email_id,
-            email_text=request.email_text[:500],  # Limit to first 500 chars
+            email_text=stored_text,
             result=result.capitalize(),
             confidence=confidence,
             model_version=prediction_result.get("model_version", "unknown"),
-            is_correct=None  # No feedback yet
+            is_correct=None
         )
         
         db.add(spam_log)
