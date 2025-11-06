@@ -2,20 +2,61 @@
 venv/
 *.pyc
 __pycache__/
+*.pyc
+.pytest_cache/
 
 # Node / React
 frontend/node_modules/
 frontend/.vite/
+frontend/dist/
 *.log
 
 # Databases / Models
 *.db
 *.pkl
+*.sqlite
+*.sqlite3
 
 # Environment / Secrets
 .env
 .env.local
+.env.*.local
+token.txt
 
-# Virtual Environment
-.venv/
-.venv
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*_backup.py
+*_backup.*
+debug_files/
+*.backup
+
+# Test files
+TEST_RESULTS.md
+test_*.py
+*_test.py
+
+# Structure/tree files
+tree.txt
+structure.txt
+*_structure.txt
+
+# Debug/development files
+decode_token.py
+tapi.*
