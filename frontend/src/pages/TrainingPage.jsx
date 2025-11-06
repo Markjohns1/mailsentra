@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BookOpen, Shield, Mail, Award, Eye, Target, Lightbulb, CheckCircle, XCircle, ThumbsUp, ThumbsDown, ChevronRight, AlertTriangle, Lock, Link as LinkIcon, Paperclip } from 'lucide-react'
+import { BookOpen, Shield, Mail, Award, Eye, Target, Lightbulb, CheckCircle, XCircle, ThumbsUp, ThumbsDown, ChevronRight, AlertTriangle, Lock, Link as LinkIcon, Paperclip, Menu, X } from 'lucide-react'
 import { trainingService } from '../services/trainingService'
 
 const TrainingPage = () => {
@@ -8,6 +8,7 @@ const TrainingPage = () => {
   const [trainingContent, setTrainingContent] = useState(null)
   const [quizAnswers, setQuizAnswers] = useState({})
   const [quizSubmitted, setQuizSubmitted] = useState({})
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     loadTrainingContent()
@@ -209,52 +210,62 @@ const TrainingPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-cyan-500 mx-auto mb-4"></div>
-          <p className="text-white text-xl">Loading Training Content...</p>
-        </div>
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-cyan-500 mx-auto mb-4"></div>
+        <p className="text-white text-xl">Loading Training Content...</p>
+      </div>
       </div>
     )
-  }
+    }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern py-8">
+    return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern py-4 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 animate-fade-in">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-3 rounded-xl shadow-lg">
-              <BookOpen className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white">
-                Security <span className="text-gradient">Training</span>
-              </h1>
-              <p className="text-slate-400 text-lg mt-1">Learn to identify and protect against email threats</p>
-            </div>
+      <div className="mb-6 sm:mb-8 animate-fade-in">
+        <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-2 sm:p-3 rounded-xl shadow-lg">
+          <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+          </div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white">
+            Security <span className="text-gradient">Training</span>
+          </h1>
+          <p className="text-slate-400 text-sm sm:text-base lg:text-lg mt-1 hidden sm:block">Learn to identify and protect against email threats</p>
+          </div>
+        </div>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 text-cyan-400 hover:bg-slate-800/50 rounded-lg border border-cyan-500/30"
+            >
+              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-1">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-4 sticky top-4">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Training Modules</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+          {/* Sidebar Navigation - Collapsible on mobile */}
+          <div className={`lg:col-span-1 ${sidebarOpen ? 'block' : 'hidden lg:block'}`}>
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-3 sm:p-4 lg:sticky lg:top-4">
+              <h2 className="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 sm:mb-4">Training Modules</h2>
               <nav className="space-y-2">
                 {sections.map((section) => {
                   const IconComponent = getIconComponent(section.icon)
                   return (
                     <button
                       key={section.id}
-                      onClick={() => setActiveSection(section.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all border ${
+                      onClick={() => {
+                        setActiveSection(section.id)
+                        setSidebarOpen(false) // Close sidebar on mobile after selection
+                      }}
+                      className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-all border text-sm sm:text-base ${
                         activeSection === section.id
                           ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-cyan-500/50 shadow-lg shadow-cyan-500/20'
                           : 'text-slate-400 hover:bg-slate-700/50 hover:text-cyan-300 border-transparent hover:border-cyan-500/30'
                       }`}
                     >
-                      <IconComponent className="h-5 w-5 flex-shrink-0" />
-                      <span className="font-medium text-sm text-left">{section.title}</span>
+                      <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                      <span className="font-medium text-left line-clamp-2">{section.title}</span>
                     </button>
                   )
                 })}
@@ -263,25 +274,25 @@ const TrainingPage = () => {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4 sm:space-y-6">
             {currentSection && (
               <>
                 {/* Content Section */}
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6 md:p-8">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-4 sm:p-6 md:p-8">
                   <div 
-                    className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-strong:text-white prose-ul:text-slate-300 prose-li:text-slate-300"
+                    className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-strong:text-white prose-ul:text-slate-300 prose-li:text-slate-300 prose-sm sm:prose-base"
                     dangerouslySetInnerHTML={{ __html: currentSection.content }}
                   />
                 </div>
 
                 {/* Examples Section */}
                 {currentSection.examples && currentSection.examples.length > 0 && (
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6 md:p-8">
-                    <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                      <Eye className="h-6 w-6 text-cyan-400" />
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-4 sm:p-6 md:p-8">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
+                      <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-cyan-400" />
                       Real Examples
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {currentSection.examples.map((example) => (
                         <div
                           key={example.id}

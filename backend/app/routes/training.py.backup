@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
@@ -98,7 +98,7 @@ class TrainingSectionUpdateSchema(BaseModel):
 
 # ==================== PUBLIC ENDPOINTS ====================
 
-@router.get("/training/content")
+@router.get("/content")
 def get_training_content(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

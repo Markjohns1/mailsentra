@@ -1,6 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { BookOpen, Plus, Edit2, Trash2, Save, X, Eye, AlertCircle, CheckCircle } from 'lucide-react'
 import { trainingService } from '../../services/trainingService'
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+
+// Custom Quill toolbar configuration - minimal and clean
+const quillModules = {
+  toolbar: [
+    [{ 'header': [2, 3, false] }],  // Only H2, H3, and Normal
+    ['bold', 'italic', 'underline'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'color': ['#00d4ff', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#ffffff'] }],  // Your theme colors
+    ['link'],
+    ['clean']
+  ]
+}
+
+const quillFormats = [
+  'header',
+  'bold', 'italic', 'underline',
+  'list', 'bullet',
+  'color',
+  'link'
+]
 
 const TrainingContentManager = () => {
   const [sections, setSections] = useState([])
@@ -166,6 +188,103 @@ const TrainingContentManager = () => {
 
   return (
     <div className="space-y-6">
+      {/* Custom styles for React Quill to match theme */}
+      <style>{`
+        .ql-toolbar {
+          background: #1e293b !important;
+          border: 1px solid #334155 !important;
+          border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+        .ql-container {
+          background: #1e293b !important;
+          border: 1px solid #334155 !important;
+          border-top: none !important;
+          border-radius: 0 0 0.5rem 0.5rem !important;
+          color: #e2e8f0 !important;
+          font-family: 'Inter', sans-serif !important;
+          font-size: 14px !important;
+          min-height: 300px;
+        }
+        .ql-editor {
+          min-height: 300px;
+          color: #e2e8f0 !important;
+        }
+        .ql-editor h2 {
+          color: #00d4ff !important;
+          font-size: 1.5rem !important;
+          font-weight: bold !important;
+          margin-bottom: 1rem !important;
+        }
+        .ql-editor h3 {
+          color: #10b981 !important;
+          font-size: 1.25rem !important;
+          font-weight: 600 !important;
+          margin-bottom: 0.75rem !important;
+        }
+        .ql-editor p {
+          color: #cbd5e1 !important;
+          margin-bottom: 1rem !important;
+        }
+        .ql-editor ul, .ql-editor ol {
+          color: #cbd5e1 !important;
+          padding-left: 1.5rem !important;
+        }
+        .ql-editor li {
+          margin-bottom: 0.5rem !important;
+        }
+        .ql-editor strong {
+          color: #fff !important;
+          font-weight: 600 !important;
+        }
+        .ql-toolbar button {
+          color: #94a3b8 !important;
+        }
+        .ql-toolbar button:hover {
+          color: #00d4ff !important;
+        }
+        .ql-toolbar button.ql-active {
+          color: #00d4ff !important;
+        }
+        .ql-stroke {
+          stroke: #94a3b8 !important;
+        }
+        .ql-fill {
+          fill: #94a3b8 !important;
+        }
+        .ql-toolbar button:hover .ql-stroke {
+          stroke: #00d4ff !important;
+        }
+        .ql-toolbar button:hover .ql-fill {
+          fill: #00d4ff !important;
+        }
+        .ql-toolbar button.ql-active .ql-stroke {
+          stroke: #00d4ff !important;
+        }
+        .ql-toolbar button.ql-active .ql-fill {
+          fill: #00d4ff !important;
+        }
+        .ql-picker-label {
+          color: #94a3b8 !important;
+        }
+        .ql-picker-label:hover {
+          color: #00d4ff !important;
+        }
+        .ql-picker-options {
+          background: #1e293b !important;
+          border: 1px solid #334155 !important;
+        }
+        .ql-picker-item {
+          color: #94a3b8 !important;
+        }
+        .ql-picker-item:hover {
+          color: #00d4ff !important;
+        }
+        .ql-editor.ql-blank::before {
+          color: #64748b !important;
+          font-style: normal !important;
+        }
+      `}</style>
+
       {/* Success/Error Messages */}
       {showSuccess && (
         <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 flex items-center gap-3 animate-fade-in">
@@ -233,15 +352,19 @@ const TrainingContentManager = () => {
             </div>
           </div>
 
-          {/* Content */}
+          {/* WYSIWYG Content Editor */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Content (HTML allowed)</label>
-            <textarea
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Content Editor
+              <span className="ml-2 text-xs text-slate-500">(Use toolbar for formatting)</span>
+            </label>
+            <ReactQuill
+              theme="snow"
               value={editForm.content}
-              onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
-              rows={12}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-cyan-500 font-mono text-sm"
-              placeholder="Enter HTML content..."
+              onChange={(value) => setEditForm({ ...editForm, content: value })}
+              modules={quillModules}
+              formats={quillFormats}
+              placeholder="Write your training content here..."
             />
           </div>
 
