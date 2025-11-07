@@ -10,19 +10,23 @@ from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.services.model_service import spam_model
+from starlette.middleware.base import BaseHTTPMiddleware
 
 limiter = Limiter(key_func=get_remote_address)
 
-# Security headers middleware
-class SecurityHeadersMiddleware:
-    async def __call__(self, request: Request, call_next):
+# Fixed SecurityHeadersMiddleware
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
+        
+        # Add security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Content-Security-Policy"] = "default-src 'self'"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        
         return response
 
 logging.basicConfig(
