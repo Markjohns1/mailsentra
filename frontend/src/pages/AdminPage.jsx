@@ -22,7 +22,7 @@ export default function AdminPage() {
   const { user } = useAuth() || {}
   const { showError, showSuccess } = useToast() || {}
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [metrics, setMetrics] = useState(null)
   const [users, setUsers] = useState([])
   const [logs, setLogs] = useState([])
