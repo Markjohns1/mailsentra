@@ -28,11 +28,12 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 animate-fade-in">
         <div className="text-center">
-          <div className="flex justify-center mb-6">
+          {/* shiled icon ..<div className="flex justify-center mb-6">
             <div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-5 rounded-2xl shadow-2xl cyber-glow">
               <Shield className="h-14 w-14 text-white" />
             </div>
           </div>
+          */}
           <h2 className="text-5xl font-extrabold text-white mb-3">
             Welcome Back
           </h2>

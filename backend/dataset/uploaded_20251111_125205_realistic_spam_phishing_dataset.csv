@@ -1,0 +1,121 @@
+label,message
+ham,"Hi Customer, I reviewed the draft you sent — it looks good overall. I left a few comments in the document; can you check them and update by Tuesday? Thanks!"
+ham,"Hi Michael, I reviewed the draft you sent — it looks good overall. I left a few comments in the document; can you check them and update by Tuesday? Thanks!"
+ham,Thanks for the quick response. I've implemented the changes and pushed them to the repository. Please pull the branch 'feature/login-fix' and test.
+spam,"Congratulations Sarah! You've been selected to receive a $10,000 gift card as part of our consumer rewards program. Claim your prize now by completing a short survey at http://click.example/offer. Limited quantity available!"
+spam,Make money as an affiliate marketer with no upfront cost. Learn the secrets from our coach — click http://verify.example/account to watch the free training.
+spam,"Congratulations Customer! You've been selected to receive a $1,200 gift card as part of our consumer rewards program. Claim your prize now by completing a short survey at http://claim.example/gift. Limited quantity available!"
+spam,"Your loan pre-approval is ready. Low interest, instant approval even with bad credit. Start your application here: http://claim.example/gift. Funds disbursed in 24 hours."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://secure-update.example/login and follow the instructions to avoid interruption."
+spam,Earn $500/week working from home. No experience required — we provide training. Click http://payment.example/resolve to register and start immediately. Spots fill up fast!
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://payment.example/resolve and follow the instructions to avoid interruption."
+spam,Make money as an affiliate marketer with no upfront cost. Learn the secrets from our coach — click http://payment.example/resolve to watch the free training.
+ham,"Hi John, thanks for the help yesterday — the server migration went smoothly. Could you also update the README with the new environment variables?"
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code SAVE20 at checkout: http://claim.example/gift."
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,Get prescription meds shipped discreetly to your door with major discounts. No prescription required — order here: http://click.example/offer.
+ham,"Good morning, attached are the finalized invoices for last month. Please confirm receipt and let me know if anything looks off so I can correct it."
+spam,Notice from Chase: There is a hold on your account due to irregular transactions. Verify your transactions at http://verify.example/account to release the hold. This is an automated security message.
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code SAVE20 at checkout: http://claim.example/gift."
+ham,"Hi John, thanks for the help yesterday — the server migration went smoothly. Could you also update the README with the new environment variables?"
+ham,"Hi Chris, I reviewed the draft you sent — it looks good overall. I left a few comments in the document; can you check them and update by Tuesday? Thanks!"
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://claim.example/gift and follow the instructions to avoid interruption."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://payment.example/resolve and follow the instructions to avoid interruption."
+spam,Your Apple ID has been locked for suspicious activity. Unlock your account now at http://click.example/offer to prevent permanent data loss.
+spam,"Congratulations Michael! You've been selected to receive a $10,000 gift card as part of our consumer rewards program. Claim your prize now by completing a short survey at http://click.example/offer. Limited quantity available!"
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,"Hello Pat, your payment of $350 was declined. To avoid interruption of service, update your billing information now at http://click.example/offer. This is a time-sensitive issue and must be resolved within 24 hours."
+ham,"Hey, are we still on for lunch today at 1pm? I found a new cafe near the office that I think you'll like."
+spam,You have a pending refund of $350. Click here http://payment.example/resolve to claim it — verification required. Returns not claimed within 7 days will be forfeited.
+spam,Get prescription meds shipped discreetly to your door with major discounts. No prescription required — order here: http://secure-update.example/login.
+spam,You have a pending refund of $50. Click here http://claim.example/gift to claim it — verification required. Returns not claimed within 7 days will be forfeited.
+spam,Congratulations Valued User! You've been selected to receive a $500 gift card as part of our consumer rewards program. Claim your prize now by completing a short survey at http://verify.example/account. Limited quantity available!
+ham,Thanks for the quick response. I've implemented the changes and pushed them to the repository. Please pull the branch 'feature/login-fix' and test.
+spam,Action required: Update your tax information to receive your government relief payment of $350. Click http://verify.example/account and complete the secure form within 72 hours.
+spam,You qualify for a brand new car lease at unbelievably low monthly rates. Limited slots available. Apply now: http://secure-update.example/login.
+spam,"Important: Your Citibank account has exceeded the allowed login attempts. To restore access, confirm your identity here: http://click.example/offer. If you don't verify within 12 hours, access will be restricted."
+ham,"Hi Jamie, I reviewed the draft you sent — it looks good overall. I left a few comments in the document; can you check them and update by Tuesday? Thanks!"
+spam,This is a private invitation to join our exclusive investment opportunity. Early participants are seeing returns of over 200% monthly. Reply with 'INTERESTED' or visit http://click.example/offer to learn more.
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+ham,"Good morning, attached are the finalized invoices for last month. Please confirm receipt and let me know if anything looks off so I can correct it."
+ham,"Hello, your subscription renewal is scheduled for next month. If you'd like to make changes to your plan, reply to this email and we'll assist."
+spam,You qualify for a brand new car lease at unbelievably low monthly rates. Limited slots available. Apply now: http://secure-update.example/login.
+spam,Congratulations Sarah! You've been selected to receive a $50 gift card as part of our consumer rewards program. Claim your prize now by completing a short survey at http://claim.example/gift. Limited quantity available!
+spam,"Security Alert: We detected unusual attempts to access your PayPal account. If this wasn't you, please reset your password immediately using this link: http://payment.example/resolve. Ignore if you have already taken action."
+spam,"Dear Jamie, we noticed suspicious activity on your Apple account from a new device. For your protection, please verify your identity immediately by clicking the secure link: http://verify.example/account. Failure to do so will result in temporary suspension."
+ham,"Hi everyone, the training materials for the cybersecurity workshop are uploaded to the shared drive. Please review before the session next week."
+spam,Your Apple ID has been locked for suspicious activity. Unlock your account now at http://claim.example/gift to prevent permanent data loss.
+ham,"Hi, the client shared detailed feedback and requested changes to the homepage layout. I'll schedule a call to go over the specifics. Available slots are 2pm or 4pm today."
+spam,"Hello Chris, your payment of $350 was declined. To avoid interruption of service, update your billing information now at http://payment.example/resolve. This is a time-sensitive issue and must be resolved within 24 hours."
+spam,"Earn $1,200/week working from home. No experience required — we provide training. Click http://claim.example/gift to register and start immediately. Spots fill up fast!"
+spam,"A document has been shared with you via Apple. To view the file, sign in with your Apple credentials here: http://verify.example/account. This link will expire in 48 hours."
+spam,"You have a pending refund of $1,200. Click here http://verify.example/account to claim it — verification required. Returns not claimed within 7 days will be forfeited."
+spam,This is a private invitation to join our exclusive investment opportunity. Early participants are seeing returns of over 300% monthly. Reply with 'INTERESTED' or visit http://payment.example/resolve to learn more.
+ham,"Hi everyone, the training materials for the cybersecurity workshop are uploaded to the shared drive. Please review before the session next week."
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,"Hello Alex, your payment of $1,200 was declined. To avoid interruption of service, update your billing information now at http://payment.example/resolve. This is a time-sensitive issue and must be resolved within 24 hours."
+spam,"Dear Jamie, we noticed suspicious activity on your PayPal account from a new device. For your protection, please verify your identity immediately by clicking the secure link: http://payment.example/resolve. Failure to do so will result in temporary suspension."
+spam,Urgent: Your parcel could not be delivered. Please pay the customs clearance fee of $350 here http://secure-update.example/login to have it released. Delivery will be rescheduled upon payment.
+spam,You qualify for a brand new car lease at unbelievably low monthly rates. Limited slots available. Apply now: http://payment.example/resolve.
+spam,"Your loan pre-approval is ready. Low interest, instant approval even with bad credit. Start your application here: http://payment.example/resolve. Funds disbursed in 24 hours."
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,Get prescription meds shipped discreetly to your door with major discounts. No prescription required — order here: http://payment.example/resolve.
+ham,"Hi everyone, the training materials for the cybersecurity workshop are uploaded to the shared drive. Please review before the session next week."
+spam,"Important: Your YourBank account has exceeded the allowed login attempts. To restore access, confirm your identity here: http://claim.example/gift. If you don't verify within 12 hours, access will be restricted."
+spam,"Dear Michael, we noticed suspicious activity on your PayPal account from a new device. For your protection, please verify your identity immediately by clicking the secure link: http://verify.example/account. Failure to do so will result in temporary suspension."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://secure-update.example/login and follow the instructions to avoid interruption."
+spam,Notice from Citibank: There is a hold on your account due to irregular transactions. Verify your transactions at http://click.example/offer to release the hold. This is an automated security message.
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code WELCOME10 at checkout: http://secure-update.example/login."
+ham,"Hello team, reminder: the weekly sync is at 10:00 AM tomorrow. Please come prepared with updates on your tasks. If you cannot attend, let me know in advance."
+ham,"Hey, are we still on for lunch today at 1pm? I found a new cafe near the office that I think you'll like."
+spam,Get prescription meds shipped discreetly to your door with major discounts. No prescription required — order here: http://verify.example/account.
+spam,Your Apple ID has been locked for suspicious activity. Unlock your account now at http://claim.example/gift to prevent permanent data loss.
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code FREEGIFT at checkout: http://click.example/offer."
+ham,"Hey, are we still on for lunch today at 1pm? I found a new cafe near the office that I think you'll like."
+ham,"Hi John, thanks for the help yesterday — the server migration went smoothly. Could you also update the README with the new environment variables?"
+spam,Make money as an affiliate marketer with no upfront cost. Learn the secrets from our coach — click http://verify.example/account to watch the free training.
+spam,Exclusive: Flash sale ends tonight. Up to 75% off on high-end electronics. Shop now: http://claim.example/gift.
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+ham,"Hi Valued User, I reviewed the draft you sent — it looks good overall. I left a few comments in the document; can you check them and update by Tuesday? Thanks!"
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code SAVE20 at checkout: http://claim.example/gift."
+spam,"Earn $2,500/week working from home. No experience required — we provide training. Click http://click.example/offer to register and start immediately. Spots fill up fast!"
+ham,Thanks for the quick response. I've implemented the changes and pushed them to the repository. Please pull the branch 'feature/login-fix' and test.
+spam,"A document has been shared with you via Bank of America. To view the file, sign in with your Bank of America credentials here: http://payment.example/resolve. This link will expire in 48 hours."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://secure-update.example/login and follow the instructions to avoid interruption."
+spam,Earn $50/week working from home. No experience required — we provide training. Click http://verify.example/account to register and start immediately. Spots fill up fast!
+ham,"Hey, are we still on for lunch today at 1pm? I found a new cafe near the office that I think you'll like."
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,Exclusive: Flash sale ends tonight. Up to 200% off on high-end electronics. Shop now: http://secure-update.example/login.
+spam,Notice from HSBC: There is a hold on your account due to irregular transactions. Verify your transactions at http://claim.example/gift to release the hold. This is an automated security message.
+spam,"You have a pending refund of $1,200. Click here http://click.example/offer to claim it — verification required. Returns not claimed within 7 days will be forfeited."
+spam,"Your loan pre-approval is ready. Low interest, instant approval even with bad credit. Start your application here: http://secure-update.example/login. Funds disbursed in 24 hours."
+ham,Thanks for the quick response. I've implemented the changes and pushed them to the repository. Please pull the branch 'feature/login-fix' and test.
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+ham,"Hi everyone, the training materials for the cybersecurity workshop are uploaded to the shared drive. Please review before the session next week."
+spam,Exclusive: Flash sale ends tonight. Up to 75% off on high-end electronics. Shop now: http://claim.example/gift.
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://verify.example/account and follow the instructions to avoid interruption."
+spam,Urgent: Your parcel could not be delivered. Please pay the customs clearance fee of $500 here http://payment.example/resolve to have it released. Delivery will be rescheduled upon payment.
+spam,Your Apple ID has been locked for suspicious activity. Unlock your account now at http://secure-update.example/login to prevent permanent data loss.
+ham,Thanks for the quick response. I've implemented the changes and pushed them to the repository. Please pull the branch 'feature/login-fix' and test.
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code SAVE20 at checkout: http://click.example/offer."
+spam,You have a pending refund of $350. Click here http://click.example/offer to claim it — verification required. Returns not claimed within 7 days will be forfeited.
+spam,This is a private invitation to join our exclusive investment opportunity. Early participants are seeing returns of over 200% monthly. Reply with 'INTERESTED' or visit http://claim.example/gift to learn more.
+spam,"Security Alert: We detected unusual attempts to access your Apple account. If this wasn't you, please reset your password immediately using this link: http://payment.example/resolve. Ignore if you have already taken action."
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,"You have a pending refund of $2,500. Click here http://click.example/offer to claim it — verification required. Returns not claimed within 7 days will be forfeited."
+spam,"Hello Alex, your payment of $10,000 was declined. To avoid interruption of service, update your billing information now at http://verify.example/account. This is a time-sensitive issue and must be resolved within 24 hours."
+spam,"Limited offer: Buy one, get one free on all supplements. Free worldwide shipping if you order in the next 2 hours. Use code FREEGIFT at checkout: http://payment.example/resolve."
+spam,"Security Alert: We detected unusual attempts to access your Microsoft account. If this wasn't you, please reset your password immediately using this link: http://claim.example/gift. Ignore if you have already taken action."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://click.example/offer and follow the instructions to avoid interruption."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://payment.example/resolve and follow the instructions to avoid interruption."
+ham,"Hi everyone, the training materials for the cybersecurity workshop are uploaded to the shared drive. Please review before the session next week."
+spam,"Dear Customer, due to a recent policy change, we require re-verification of your account. Please visit http://verify.example/account and follow the instructions to avoid interruption."
+spam,"Action required: Update your tax information to receive your government relief payment of $10,000. Click http://secure-update.example/login and complete the secure form within 72 hours."
+spam,You qualify for a brand new car lease at unbelievably low monthly rates. Limited slots available. Apply now: http://payment.example/resolve.
+ham,"Please find the meeting minutes attached. Action items include: 1) update wireframes, 2) confirm resources, 3) provide timeline estimates by Friday."
+spam,"A document has been shared with you via PayPal. To view the file, sign in with your PayPal credentials here: http://claim.example/gift. This link will expire in 48 hours."
+ham,"Hi Pat, I reviewed the draft you sent — it looks good overall. I left a few comments in the document; can you check them and update by Tuesday? Thanks!"
+ham,Thanks for the quick response. I've implemented the changes and pushed them to the repository. Please pull the branch 'feature/login-fix' and test.
+spam,"Earn $10,000/week working from home. No experience required — we provide training. Click http://click.example/offer to register and start immediately. Spots fill up fast!"
+ham,"Hello team, reminder: the weekly sync is at 10:00 AM tomorrow. Please come prepared with updates on your tasks. If you cannot attend, let me know in advance."
+spam,Get prescription meds shipped discreetly to your door with major discounts. No prescription required — order here: http://secure-update.example/login.

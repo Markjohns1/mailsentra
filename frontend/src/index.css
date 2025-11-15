@@ -4,9 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========================================
+/* 
    GLOBAL RESPONSIVE DESIGN SYSTEM
-   ======================================== */
+    */
 
 :root {
   /* Responsive spacing */
@@ -45,9 +45,9 @@
   --breakpoint-xl: 1280px;
 }
 
-/* ========================================
+/* 
    BASE RESPONSIVE STYLES
-   ======================================== */
+    */
 
 * {
   box-sizing: border-box;
@@ -67,7 +67,8 @@ body {
   background: #0a0e27;
   color: #e2e8f0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: var(--font-base);
+  /*font-size: var(--font-base);*/
+  font-size: 16px;
   line-height: 1.5;
   overflow-x: hidden;
 }
@@ -78,9 +79,9 @@ body {
   min-height: 100vh;
 }
 
-/* ========================================
+/* 
    RESPONSIVE UTILITY CLASSES
-   ======================================== */
+    */
 
 @layer components {
   /* Responsive Container */
@@ -156,13 +157,13 @@ body {
   /* Responsive Heading Sizes */
   .heading-responsive-xl {
     font-size: var(--font-3xl);
-    font-weight: 800;
+    font-weight: 600;
     line-height: 1.2;
   }
   
   .heading-responsive-lg {
     font-size: var(--font-2xl);
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.3;
   }
   
@@ -304,9 +305,9 @@ body {
   }
 }
 
-/* ========================================
+/* 
    RESPONSIVE SCROLLBAR
-   ======================================== */
+    */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -334,9 +335,9 @@ body {
   background: #374151;
 }
 
-/* ========================================
+/* 
    RESPONSIVE ANIMATIONS
-   ======================================== */
+    */
 
 @keyframes fadeIn {
   from {
@@ -364,9 +365,9 @@ body {
   }
 }
 
-/* ========================================
+/* 
    RESPONSIVE FORM ELEMENTS
-   ======================================== */
+    */
 
 input,
 textarea,
@@ -382,9 +383,9 @@ select {
   }
 }
 
-/* ========================================
+/* 
    PRINT STYLES
-   ======================================== */
+    */
 
 @media print {
   body {
@@ -397,9 +398,9 @@ select {
   }
 }
 
-/* ========================================
+/* 
    EXISTING THEME STYLES
-   ======================================== */
+    */
 
 .text-gradient {
   background: linear-gradient(135deg, #00d4ff 0%, #0099ff 100%);
