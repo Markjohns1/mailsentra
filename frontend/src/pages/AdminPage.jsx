@@ -697,30 +697,49 @@ const tabs = [
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-slate-700/50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">User</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Result</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Confidence</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-700">
+                  {isMobile ? (
+                    <div className="space-y-4 p-4">
                       {logs.map((log) => (
-                        <tr key={log.id} className="hover:bg-slate-700/30">
-                          <td className="px-6 py-4 text-sm text-slate-300">{log.username}</td>
-                          <td className="px-6 py-4">
-                            <span className={`px-3 py-1 text-xs rounded ${log.result.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                        <div key={log.id} className="bg-slate-700/50 p-4 rounded-lg border border-slate-600 shadow-sm transition-all hover:bg-slate-700/80">
+                          <div className="flex justify-between items-start mb-2">
+                            <p className="font-semibold text-white truncate max-w-[60%]">{log.username}</p>
+                            <span className={`px-2 py-0.5 text-[10px] rounded uppercase font-bold ${log.result.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                               {log.result}
                             </span>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-slate-300">{(log.confidence * 100).toFixed(2)}%</td>
-                          <td className="px-6 py-4 text-sm text-slate-400">{new Date(log.created_at).toLocaleDateString()}</td>
-                        </tr>
+                          </div>
+                          <div className="flex justify-between items-center text-xs text-slate-400">
+                            <span>Confidence: <span className="text-slate-200">{(log.confidence * 100).toFixed(1)}%</span></span>
+                            <span>{new Date(log.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  ) : (
+                    <table className="w-full">
+                      <thead className="bg-slate-700/50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">User</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Result</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Confidence</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-700">
+                        {logs.map((log) => (
+                          <tr key={log.id} className="hover:bg-slate-700/30 transition-colors">
+                            <td className="px-6 py-4 text-sm text-slate-300 font-medium">{log.username}</td>
+                            <td className="px-6 py-4">
+                              <span className={`px-3 py-1 text-xs rounded-full ${log.result.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
+                                {log.result}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-300 font-mono">{(log.confidence * 100).toFixed(2)}%</td>
+                            <td className="px-6 py-4 text-sm text-slate-400">{new Date(log.created_at).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               )}
             </div>
@@ -830,65 +849,109 @@ const tabs = [
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-slate-700/50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">User</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Original</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Corrected</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Status</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Date</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-700">
+                    {isMobile ? (
+                      <div className="space-y-4 p-4">
                         {filteredFeedback.map((f) => (
-                          <tr key={f.id} className="hover:bg-slate-700/30">
-                            <td className="px-6 py-4 text-sm text-slate-300">{f.username}</td>
-                            <td className="px-6 py-4">
-                              <span className={`px-3 py-1 text-xs rounded ${f.original_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                          <div key={f.id} className="bg-slate-700/50 p-4 rounded-lg border border-slate-600 shadow-sm">
+                            <div className="flex justify-between items-start mb-3">
+                              <p className="font-semibold text-white">{f.username}</p>
+                              <div className="flex gap-2">
+                                <button onClick={() => viewFeedbackDetails(f.id)} className="p-2 bg-slate-800 rounded text-blue-400 shadow-lg">
+                                  <Eye size={16} />
+                                </button>
+                                <button onClick={() => deleteFeedback(f.id)} className="p-2 bg-slate-800 rounded text-red-400 shadow-lg">
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 mb-3">
+                              <div className="text-[10px] text-slate-500 uppercase font-bold">Original</div>
+                              <div className="text-[10px] text-slate-500 uppercase font-bold">Corrected</div>
+                              <div className={`text-xs p-1 rounded text-center ${f.original_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                                 {f.original_result}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className={`px-3 py-1 text-xs rounded ${f.corrected_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                              </div>
+                              <div className={`text-xs p-1 rounded text-center ${f.corrected_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                                 {f.corrected_result}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center text-xs">
                               {f.was_misclassified ? (
-                                <span className="flex items-center gap-1 text-xs text-orange-400">
-                                  <AlertCircle size={14} />
-                                  For Training
+                                <span className="flex items-center gap-1 text-orange-400 px-2 py-0.5 bg-orange-400/10 rounded">
+                                  <AlertCircle size={12} />
+                                  Action Required
                                 </span>
                               ) : (
-                                <span className="flex items-center gap-1 text-xs text-green-400">
-                                  <CheckCircle size={14} />
+                                <span className="flex items-center gap-1 text-green-400 px-2 py-0.5 bg-green-400/10 rounded">
+                                  <CheckCircle size={12} />
                                   Correct
                                 </span>
                               )}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-slate-400">{new Date(f.created_at).toLocaleDateString()}</td>
-                            <td className="px-6 py-4 text-sm flex gap-2">
-                              <button 
-                                onClick={() => viewFeedbackDetails(f.id)} 
-                                title="View Details" 
-                                className="p-2 hover:bg-slate-700 rounded text-blue-400 hover:text-blue-300"
-                              >
-                                <Eye size={16} />
-                              </button>
-                              <button 
-                                onClick={() => deleteFeedback(f.id)} 
-                                title="Delete" 
-                                className="p-2 hover:bg-slate-700 rounded text-red-400 hover:text-red-300"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </td>
-                          </tr>
+                              <span className="text-slate-500">{new Date(f.created_at).toLocaleDateString()}</span>
+                            </div>
+                          </div>
                         ))}
-                      </tbody>
-                    </table>
+                      </div>
+                    ) : (
+                      <table className="w-full">
+                        <thead className="bg-slate-700/50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">User</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Original</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Corrected</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-700">
+                          {filteredFeedback.map((f) => (
+                            <tr key={f.id} className="hover:bg-slate-700/30 transition-colors">
+                              <td className="px-6 py-4 text-sm text-slate-300 font-medium">{f.username}</td>
+                              <td className="px-6 py-4">
+                                <span className={`px-3 py-1 text-xs rounded-full ${f.original_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
+                                  {f.original_result}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <span className={`px-3 py-1 text-xs rounded-full ${f.corrected_result?.toLowerCase().includes('spam') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
+                                  {f.corrected_result}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                {f.was_misclassified ? (
+                                  <span className="flex items-center gap-1.5 text-xs text-orange-400 bg-orange-400/5 px-2 py-1 rounded-md border border-orange-400/20">
+                                    <AlertCircle size={14} />
+                                    For Training
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1.5 text-xs text-green-400 bg-green-400/5 px-2 py-1 rounded-md border border-green-400/20">
+                                    <CheckCircle size={14} />
+                                    Correct
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-slate-400 font-mono">{new Date(f.created_at).toLocaleDateString()}</td>
+                              <td className="px-6 py-4 text-sm flex gap-2">
+                                <button 
+                                  onClick={() => viewFeedbackDetails(f.id)} 
+                                  title="View Details" 
+                                  className="p-2 hover:bg-slate-700 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                  <Eye size={18} />
+                                </button>
+                                <button 
+                                  onClick={() => deleteFeedback(f.id)} 
+                                  title="Delete" 
+                                  className="p-2 hover:bg-slate-700 rounded-lg text-red-400 hover:text-red-300 transition-colors"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
                   </div>
                 )}
               </div>

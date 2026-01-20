@@ -80,6 +80,88 @@ def create_sample_dataset():
     logger.info("Sample dataset created")
     return 'dataset/sample_spam.csv'
 
+def get_email_augmentation_data():
+    """
+    Generate synthetic email spam data to augment SMS dataset.
+    The SMS dataset lacks common email spam triggers like 'Viagra', 'Cialis', 'pharmacy',
+    and specific phishing patterns. This ensures the model catches these.
+    """
+    data = {
+        'label': [],
+        'message': []
+    }
+    
+    # Pharma Spam
+    pharma_keywords = [
+        "Viagra", "Cialis", "Levitra", "Canadian Pharmacy", "cheap meds", 
+        "prescription free", "sexual performance", "blue pill", "enhancement"
+    ]
+    
+    for kw in pharma_keywords:
+        data['label'].extend(['spam'] * 5)
+        data['message'].extend([
+            f"Buy {kw} now! Cheapest prices online.",
+            f"Get your {kw} prescription free today.",
+            f"Limited time offer: 80% off {kw}.",
+            f"Improve your life with {kw} - click here http://spam.com/{kw.lower()}",
+            f"Generic {kw} available overnight shipping."
+        ])
+
+    # Nigerian Prince / Advance Fee Scam
+    data['label'].extend(['spam'] * 5)
+    data['message'].extend([
+        "I am Prince Al-Waleed, I need your help to transfer $50 million.",
+        "A large inheritance is waiting for you. Please reply with bank details.",
+        "URGENT: Beneficiary fund transfer notification. Contact us immediately.",
+        "My late husband left a sum of 10.5M USD for charity. Can you help?",
+        "Strictly confidential: Business proposal for mutual benefit."
+    ])
+    
+    # Account/Phishing
+    data['label'].extend(['spam'] * 5)
+    data['message'].extend([
+        "Your account has been locked. Verify identity here: http://fake-bank.com/login",
+        "Suspicious activity detected. Click to secure your account immediately.",
+        "Final Notice: Your subscription will be cancelled.",
+        "Update your payment information to avoid service interruption.",
+        "Microsoft Security Alert: Unusual sign-in detected."
+    ])
+
+    # Work from Home / Easy Money (Generic)
+    data['label'].extend(['spam'] * 5)
+    data['message'].extend([
+        "Make $5000 a week working from home! No experience needed.",
+        "Be your own boss. Sign up for this exclusive opportunity.",
+        "Passive income guaranteed. Click to learn more.",
+        "Job Offer: Part-time product tester needed. $50/hour.",
+        "Turn $100 into $1000 in just 24 hours with Crypto."
+    ])
+
+    # Prizes / Gift Cards
+    data['label'].extend(['spam'] * 5)
+    data['message'].extend([
+        "Congratulations! You've won a $1000 Walmart Gift Card.",
+        "You are our 1,000,000th visitor! Click to claim your prize.",
+        "Spin the wheel to win a free iPhone 15 Pro.",
+        "Your rewards are waiting. Redeem your points now.",
+        "Exclusive offer: You have been selected for a luxury cruise."
+    ])
+    
+    # Urgent / Action Required (Generic structural patterns)
+    data['label'].extend(['spam'] * 5)
+    data['message'].extend([
+        "URGENT: Immediate attention required regarding your file.",
+        "Final Warning: Your service will be terminated.",
+        "Action Required: Please sign this document via DocuSign.",
+        "Invoice #12345 is overdue. Pay now to avoid fees.",
+        "Password Expiry Notification. Update your credentials."
+    ])
+
+    df = pd.DataFrame(data)
+    logger.info(f"Generated {len(df)} synthetic email spam samples")
+    return df
+
+
 def load_dataset(filepath):
     """Load and prepare the spam dataset"""
     logger.info(f"Loading dataset from {filepath}")
@@ -501,6 +583,18 @@ def main(dataset_path=None):
 
         # Step 2: Load dataset
         df = load_dataset(dataset_path)
+        
+        # Step 2.5: Augment with email-specific spam data
+        logger.info("Augmenting SMS dataset with synthetic email clusters...")
+        email_features_df = get_email_augmentation_data()
+        
+        # Normalize column names for concatenation
+        if 'text' in df.columns:
+            df = df.rename(columns={'text': 'message'})
+        
+        df = pd.concat([df, email_features_df], ignore_index=True)
+        logger.info(f"Total dataset size after augmentation: {len(df)} samples")
+
 
         # Step 3: Preprocess dataset
         df = preprocess_dataset(df)

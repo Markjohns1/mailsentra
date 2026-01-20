@@ -81,22 +81,16 @@ class EmailPreprocessor:
 
     def remove_urls(self, text: str) -> str:
         """
-        Remove URLs from text (common in spam emails)
-
-        Args:
-            text: Text potentially containing URLs
-
-        Returns:
-            Text with URLs removed
+        Replace URLs with a special token 'http_url' to keep them as features
         """
         if not text:
             return ""
 
         try:
-            # Remove http/https URLs
-            text = re.sub(r'https?://\S+', '', text)
-            # Remove www URLs
-            text = re.sub(r'www\.\S+', '', text)
+            # Replace http/https URLs with token
+            text = re.sub(r'https?://\S+', 'http_url', text)
+            # Replace www URLs
+            text = re.sub(r'www\.\S+', 'http_url', text)
             # Clean up extra spaces
             text = re.sub(r'\s+', ' ', text).strip()
             return text
@@ -106,20 +100,14 @@ class EmailPreprocessor:
 
     def remove_emails(self, text: str) -> str:
         """
-        Remove email addresses from text
-
-        Args:
-            text: Text potentially containing email addresses
-
-        Returns:
-            Text with email addresses removed
+        Replace email addresses with 'email_addr' token
         """
         if not text:
             return ""
 
         try:
-            # Remove email addresses
-            text = re.sub(r'\S+@\S+', '', text)
+            # Replace email addresses
+            text = re.sub(r'\S+@\S+', 'email_addr', text)
             # Clean up extra spaces
             text = re.sub(r'\s+', ' ', text).strip()
             return text
@@ -141,8 +129,8 @@ class EmailPreprocessor:
             return ""
 
         try:
-            # Keep only letters, numbers, and spaces
-            clean_text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
+            # Keep only letters, numbers, spaces, and underscores (for tokens)
+            clean_text = re.sub(r'[^a-zA-Z0-9\s_]', ' ', text)
             # Remove extra whitespace
             clean_text = re.sub(r'\s+', ' ', clean_text).strip()
 

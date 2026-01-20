@@ -7,29 +7,12 @@ from datetime import datetime, timedelta
 import secrets
 import hashlib
 
+from app.models.api_key import APIKey
 from app.database import get_db
 from app.models.user import User
 from app.dependencies import get_current_user
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
-from sqlalchemy.sql import func
-from app.database import Base
 
 router = APIRouter()
-
-"""API Key model."""
-"""class APIKey(Base):
-    
-    __tablename__ = "api_keys"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    key_hash = Column(String, nullable=False, unique=True, index=True)
-    key_name = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
-    last_used = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-   expires_at = Column(DateTime(timezone=True), nullable=True)
-"""
 
 class GenerateKeyRequest(BaseModel):
     key_name: str
@@ -61,14 +44,6 @@ def generate_api_key_endpoint(
 ):
     """
     Generate a new API key for authenticated user.
-    
-    Parameters i take here include:-
-        request:     Key name and expiration
-        current_user: Authenticated user
-        db:           Database session
-    
-    Returns:
-        Generated API key (displayed only once)
     """
     try:
         # Generate API key
@@ -83,8 +58,8 @@ def generate_api_key_endpoint(
         # Store in database
         db_key = APIKey(
             user_id=current_user.id,
-            key_hash=key_hash,
-            key_name=request.key_name,
+            key=key_hash, # Using 'key' to store the hash to match APIKey model
+            name=request.key_name,
             is_active=True,
             expires_at=expires_at
         )
@@ -123,9 +98,9 @@ def list_user_keys(
             "keys": [
                 {
                     "id": k.id,
-                    "key_name": k.key_name,
+                    "key_name": k.name,
                     "is_active": k.is_active,
-                    "last_used": k.last_used.isoformat() if k.last_used else None,
+                    "last_used": k.last_used_at.isoformat() if k.last_used_at else None,
                     "created_at": k.created_at.isoformat(),
                     "expires_at": k.expires_at.isoformat() if k.expires_at else None
                 }
@@ -178,21 +153,11 @@ def revoke_api_key(
 def verify_api_key(key: str, db: Session) -> APIKey:
     """
     Verify API key and return key object.
-    
-    Parameters:
-        key: API key to verify
-        db: Database session
-    
-    Returns:
-        APIKey object if valid
-    
-    Raises:
-        HTTPException if key is invalid
     """
     key_hash = hash_api_key(key)
     
     db_key = db.query(APIKey).filter(
-        APIKey.key_hash == key_hash,
+        APIKey.key == key_hash,
         APIKey.is_active == True
     ).first()
     
@@ -210,7 +175,8 @@ def verify_api_key(key: str, db: Session) -> APIKey:
         )
     
     # Update last used
-    db_key.last_used = datetime.utcnow()
+    db_key.last_used_at = datetime.utcnow()
+    db_key.usage_count += 1
     db.commit()
     
     return db_key

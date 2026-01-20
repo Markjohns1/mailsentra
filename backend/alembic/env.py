@@ -17,6 +17,8 @@ from app.models.email import Email
 from app.models.spam_log import SpamLog
 from app.models.use_feedback import UserFeedback
 from app.models.api_key import APIKey
+from app.models.training import TrainingSection, TrainingExample, TrainingQuiz, TrainingTip
+
 
 # this is the Alembic Config object
 config = context.config
