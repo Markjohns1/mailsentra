@@ -9,6 +9,7 @@ import hashlib
 
 from app.database import get_db
 from app.models.user import User
+from app.models.api_key import APIKey
 from app.dependencies import get_current_user
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.sql import func
