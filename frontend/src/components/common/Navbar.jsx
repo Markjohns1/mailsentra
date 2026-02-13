@@ -15,9 +15,9 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-90 transition-all group">
-            <div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-1.5 sm:p-2 rounded-lg shadow-lg group-hover:shadow-cyan-500/50 transition-shadow">
+            {/*<div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-1.5 sm:p-2 rounded-lg shadow-lg group-hover:shadow-cyan-500/50 transition-shadow">
               <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </div>
+            </div>*/}
             <span className="text-xl sm:text-2xl font-extrabold text-gradient">
               MailSentra
             </span>

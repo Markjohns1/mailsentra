@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr
 import re
 from app.database import get_db
 from app.models.user import User
-from app.utils.security import verify_password, get_password_hash, create_access_token
+from app.utils.security import verify_password, get_password_hash, create_access_token, create_refresh_token
 from app.dependencies import get_current_user
 
 router = APIRouter()
@@ -28,7 +28,9 @@ class UserResponse(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
+
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(user_data: UserRegister, db: Session = Depends(get_db)):
@@ -115,17 +117,63 @@ def login(
             detail="Inactive user"
         )
 
-    # Create access token WITH ADMIN STATUS - THIS IS THE FIX!
-    access_token = create_access_token(data={
+    # Create access token and refresh token
+    token_data = {
         "sub": user.email,
         "is_admin": user.is_admin,
         "user_id": user.id
-    })
-
+    }
+    
+    access_token = create_access_token(data=token_data)
+    refresh_token = create_refresh_token(data={"sub": user.email})
+    
     return {
         "access_token": access_token,
+        "refresh_token": refresh_token,
         "token_type": "bearer"
     }
+
+@router.post("/refresh", response_model=Token)
+def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
+    """
+    Refresh access token using a valid refresh token
+    """
+    from app.utils.security import decode_access_token
+    
+    payload = decode_access_token(refresh_token)
+    if not payload or payload.get("type") != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    email = payload.get("sub")
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or inactive",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    # Create new tokens
+    token_data = {
+        "sub": user.email,
+        "is_admin": user.is_admin,
+        "user_id": user.id
+    }
+    
+    new_access_token = create_access_token(data=token_data)
+    new_refresh_token = create_refresh_token(data={"sub": user.email})
+    
+    return {
+        "access_token": new_access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer"
+    }
+
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: User = Depends(get_current_user)):

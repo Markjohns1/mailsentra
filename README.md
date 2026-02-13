@@ -15,7 +15,7 @@
 
 MailSentra is a production-ready, full-stack email spam detection system powered by machine learning. It combines advanced NLP techniques with a modern web interface to provide real-time spam classification, continuous learning through user feedback, and comprehensive analytics.
 
-## ✨ Key Features
+## Key Features
 
 - **Real-time Classification**: Analyze emails instantly with 95%+ accuracy
 - **Adaptive Learning**: Model improves continuously from user feedback
@@ -24,7 +24,7 @@ MailSentra is a production-ready, full-stack email spam detection system powered
 - **Analytics Dashboard**: Real-time metrics and performance monitoring
 - **API-First Design**: RESTful API with comprehensive OpenAPI documentation
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
@@ -43,18 +43,18 @@ MailSentra is a production-ready, full-stack email spam detection system powered
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **Spam Detection** | ML-powered email classification | ✅ Production |
-| **User Management** | Registration, authentication, profiles | ✅ Production |
-| **Analysis History** | Searchable log with filtering | ✅ Production |
-| **Feedback Loop** | User corrections for model improvement | ✅ Production |
-| **Model Retraining** | Admin-controlled retraining pipeline | ✅ Production |
-| **Dataset Upload** | **NEW!** Admin upload CSV datasets for training | ✅ Production |
-| **Custom Training** | **NEW!** Train models with your own datasets | ✅ Production |
-| **Analytics** | System metrics and performance tracking | ✅ Production |
-| **Rate Limiting** | API protection and abuse prevention | ✅ Production |
-| **Audit Logging** | Comprehensive activity tracking | ✅ Production |
+| **Spam Detection** | ML-powered email classification |   -  Production |
+| **User Management** | Registration, authentication, profiles |   -  Production |
+| **Analysis History** | Searchable log with filtering |   -  Production |
+| **Feedback Loop** | User corrections for model improvement |   -  Production |
+| **Model Retraining** | Admin-controlled retraining pipeline |   -  Production |
+| **Dataset Upload** | **NEW!** Admin upload CSV datasets for training |   -  Production |
+| **Custom Training** | **NEW!** Train models with your own datasets |   -  Production |
+| **Analytics** | System metrics and performance tracking |   -  Production |
+| **Rate Limiting** | API protection and abuse prevention |   -  Production |
+| **Audit Logging** | Comprehensive activity tracking |   -  Production |
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -119,11 +119,11 @@ npm run dev
 - **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Alternative API Docs**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-## 📸 Screenshots
+## Screenshots
 
 > **Note**: Screenshots will be added soon. Check back for visual previews of the dashboard, analysis interface, and analytics pages.
 
-## 📚 Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -134,7 +134,7 @@ npm run dev
 | [Training Guide](docs/TRAINING_GUIDE.md) | **NEW!** Model training & dataset management |
 | [Training Quick Start](docs/TRAINING_QUICK_START.md) | Quick reference for training workflows |
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 - **FastAPI 0.104.1** - Modern, fast web framework
@@ -160,7 +160,7 @@ npm run dev
 - **SQLite** - Development environment
 - **PostgreSQL** - Production deployment
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 mailsentra/
@@ -188,7 +188,7 @@ mailsentra/
 └── LICENSE                   # MIT License
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Backend tests
@@ -203,7 +203,7 @@ npm test
 pytest --cov=app tests/
 ```
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ```bash
 # Build and run with Docker Compose
@@ -216,7 +216,7 @@ docker-compose logs -f
 docker-compose down
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
 - Code of Conduct
@@ -224,41 +224,41 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - Submitting pull requests
 - Coding standards
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## Author
 
 **John O. Mark** - Founder & Lead Developer
 
 - Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
 - GitHub: [@Markjohns1](https://github.com/Markjohns1)
 
-## 📞 Support
+## Support
 
-- 📧 Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/Markjohns1/mailsentra/issues)
-- 📖 Documentation: [docs/](docs/)
+- Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
+- Issues: [GitHub Issues](https://github.com/Markjohns1/mailsentra/issues)
+- Documentation: [docs/](docs/)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - SMS Spam Collection Dataset
 - FastAPI and React communities
 - All contributors and supporters
 
-## 📈 Project Roadmap
+## Project Roadmap
 
-- [ ] Mobile application (iOS/Android)
+- [ ] Integration with email providers (Gmail)
+- [ ] Mobile application (Android)
 - [ ] Browser extension
 - [ ] Multi-language support
 - [ ] Advanced analytics with AI insights
-- [ ] Integration with email providers (Gmail, Outlook)
 - [ ] Batch email processing
 - [ ] Custom model training for enterprises
 
 ---
 
-**Made with ❤️ by John O. Mark**
+**Made with L❤️ by John O. Mark**
 
 *Version 1.0.0 - Last updated: October 2024*

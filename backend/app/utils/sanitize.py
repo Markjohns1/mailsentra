@@ -53,9 +53,14 @@ def sanitize_email_text(email_text: str) -> str:
     # Remove null bytes
     email_text = email_text.replace('\x00', '')
     
-    # Limit length to prevent DoS
-    if len(email_text) > 10000:
-        email_text = email_text[:10000]
+    # Escape HTML to prevent XSS if displayed raw
+    # We call our more thorough sanitize_text here
+    sanitized = sanitize_text(email_text)
     
-    return email_text
+    # Limit length to prevent DoS
+    if len(sanitized) > 5000:
+        sanitized = sanitized[:5000]
+    
+    return sanitized
+
 
