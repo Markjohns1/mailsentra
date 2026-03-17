@@ -7,7 +7,7 @@ import pickle
 import logging
 from typing import Dict, Any
 from pathlib import Path
-from app.services.preprocessing import email_preprocessor
+from .preprocessing import email_preprocessor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,9 +33,9 @@ class SpamDetectionModel:
             model_path: Path to the trained model file
         """
         self.model_path = model_path
-        self.model = None
-        self.vectorizer = None
-        self.metadata = None
+        self.model: Any = None
+        self.vectorizer: Any = None
+        self.metadata: Dict[str, Any] = {}
         self.is_loaded = False
         
         # Try to load model on initialization
@@ -58,14 +58,23 @@ class SpamDetectionModel:
             
             # Load model
             with open(self.model_path, 'rb') as f:
-                self.metadata = pickle.load(f)
+                loaded_data = pickle.load(f)
             
-            self.model = self.metadata['model']
-            self.vectorizer = self.metadata['vectorizer']
+            if not isinstance(loaded_data, dict):
+                logger.error("Invalid model format - expected dictionary")
+                return False
+
+            self.metadata = loaded_data
+            self.model = self.metadata.get('model')
+            self.vectorizer = self.metadata.get('vectorizer')
             
-            logger.info(f"Model loaded successfully!")
+            if not self.model or not self.vectorizer:
+                logger.error("Model or Vectorizer missing from metadata")
+                return False
+                
+            logger.info("Model loaded successfully!")
             logger.info(f"   - Version: {self.metadata.get('version', 'unknown')}")
-            logger.info(f"   - Accuracy: {self.metadata.get('accuracy', 0) * 100:.2f}%")
+            logger.info(f"   - Accuracy: {float(self.metadata.get('accuracy', 0)) * 100:.2f}%")
             logger.info(f"   - Algorithm: {self.metadata.get('algorithm', 'unknown')}")
             logger.info(f"   - Trained at: {self.metadata.get('trained_at', 'unknown')}")
             
@@ -113,21 +122,34 @@ class SpamDetectionModel:
             # Vectorize
             text_vectorized = self.vectorizer.transform([processed_text])
             
-            # Predict
-            prediction = self.model.predict(text_vectorized)[0]
-            
             # Get probability/confidence
             probabilities = self.model.predict_proba(text_vectorized)[0]
-            confidence = float(max(probabilities))
             
-            # Determine result
-            result = "spam" if prediction == "spam" else "ham"
+            try:
+                spam_idx = list(self.model.classes_).index("spam")
+            except ValueError:
+                spam_idx = 1
+                
+            spam_prob = float(probabilities[spam_idx])
             
-            logger.info(f"Prediction: {result.upper()} (confidence: {confidence * 100:.2f}%)")
+            # Determine result with confidence states
+            # Threshold tuning: 0.65 = spam, 0.45-0.65 = uncertain, <0.45 = ham
+            if spam_prob >= 0.65:
+                result = "spam"
+                confidence = spam_prob
+            elif spam_prob >= 0.45:
+                result = "uncertain"
+                confidence = spam_prob
+            else:
+                result = "ham"
+                confidence = 1.0 - spam_prob
+            
+            logger.info(f"Prediction: {result.upper()} (spam probability: {spam_prob * 100:.2f}%)")
             
             return {
                 "result": result,
                 "confidence": confidence,
+                "spam_probability": spam_prob,
                 "is_spam": result == "spam",
                 "processed_text": processed_text,
                 "original_length": len(email_text),

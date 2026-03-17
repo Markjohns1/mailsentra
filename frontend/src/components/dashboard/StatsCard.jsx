@@ -16,13 +16,13 @@ const StatsCard = ({ title, value, icon, color }) => {
   }
 
   return (
-    <div className={`card-cyber ${gradientClasses[color]} p-6 rounded-xl shadow-lg border-2 backdrop-blur-sm transform hover:scale-[1.02] transition-all duration-300 animate-fade-in`}>
+    <div className={`card-cyber ${gradientClasses[color]} p-5 rounded-lg border backdrop-blur-sm animate-fade-in`}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-slate-400 mb-3 uppercase tracking-wider">{title}</h3>
-          <p className="text-4xl md:text-5xl font-extrabold text-white mb-1">{typeof value === 'string' ? value : value.toLocaleString()}</p>
+          <h3 className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-tight">{title}</h3>
+          <p className="text-3xl font-extrabold text-white">{typeof value === 'string' ? value : value.toLocaleString()}</p>
         </div>
-        <div className={`${iconClasses[color]} opacity-90 p-3 bg-${color}-500/10 rounded-lg border border-${color}-500/20`}>
+        <div className={`${iconClasses[color]} opacity-80`}>
           {icon}
         </div>
       </div>

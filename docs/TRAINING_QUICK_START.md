@@ -1,6 +1,6 @@
 # Training & Retraining Quick Start Guide
 
-## 🚀 For Admins: How to Train/Retrain Models
+## For Admins: How to Train/Retrain Models
 
 ### Option 1: Upload Your Own Dataset (Easiest!)
 
@@ -36,7 +36,7 @@
 
 ---
 
-## 📋 CSV Format Example
+## CSV Format Example
 
 ```csv
 label,message
@@ -53,7 +53,7 @@ ham,Thanks for the help yesterday
 
 ---
 
-## 💡 Key Concepts
+## Key Concepts
 
 ### Initial Training
 - Trains from scratch with a dataset
@@ -73,7 +73,7 @@ ham,Thanks for the help yesterday
 
 ---
 
-## 🔧 For ML Developers
+## For ML Developers
 
 ### Training Pipeline
 
@@ -93,7 +93,7 @@ ham,Thanks for the help yesterday
 
 ---
 
-## 📊 Expected Results
+## Expected Results
 
 - **Accuracy**: Typically 85-98% depending on data quality
 - **Training Time**: 1-5 minutes for 1000-10000 samples
@@ -101,7 +101,7 @@ ham,Thanks for the help yesterday
 
 ---
 
-## 🎯 Best Practices
+## Best Practices
 
 1. **Start with default dataset** for baseline
 2. **Upload larger datasets** for better accuracy (5000+ samples)
@@ -111,7 +111,7 @@ ham,Thanks for the help yesterday
 
 ---
 
-## ⚠️ Common Issues
+## Common Issues
 
 **"Invalid CSV format"**
 - Check you have `label` and `message` columns

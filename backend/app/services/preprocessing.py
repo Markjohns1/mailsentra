@@ -81,21 +81,33 @@ class EmailPreprocessor:
 
     def remove_urls(self, text: str) -> str:
         """
-        Replace URLs with a special token 'http_url' to keep them as features
+        Preserve domain signals from URLs instead of stripping them out completely.
+        Example: 'http://example.edu/path' -> 'url_domain_edu'
         """
         if not text:
             return ""
 
         try:
-            # Replace http/https URLs with token
-            text = re.sub(r'https?://\S+', 'http_url', text)
+            # Function to extract and replace domain
+            def url_replacer(match):
+                url = match.group(0)
+                # Try to extract the top-level domain
+                domain_match = re.search(r'\.([a-zA-Z]+)(?:/|$)', url)
+                if domain_match:
+                    tld = domain_match.group(1).lower()
+                    return f" url_domain_{tld} "
+                return " url_token "
+
+            # Replace http/https URLs
+            text = re.sub(r'https?://[^\s<>"]+', url_replacer, text)
             # Replace www URLs
-            text = re.sub(r'www\.\S+', 'http_url', text)
+            text = re.sub(r'www\.[^\s<>"]+', url_replacer, text)
+            
             # Clean up extra spaces
             text = re.sub(r'\s+', ' ', text).strip()
             return text
         except Exception as e:
-            logger.error(f"Error removing URLs: {e}")
+            logger.error(f"Error processing URLs: {e}")
             return text
 
     def remove_emails(self, text: str) -> str:

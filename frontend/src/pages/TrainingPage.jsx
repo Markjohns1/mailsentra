@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BookOpen, Shield, Mail, Award, Eye, Target, Lightbulb, CheckCircle, XCircle, ThumbsUp, ThumbsDown, ChevronRight, AlertTriangle, Lock, Link as LinkIcon, Paperclip, Menu, X } from 'lucide-react'
+import { BookOpen, Mail, Award, Eye, Target, Lightbulb, CheckCircle, XCircle, ThumbsUp, ThumbsDown, ChevronRight, AlertTriangle, Lock, Link as LinkIcon, Paperclip, Menu, X } from 'lucide-react'
 import { trainingService } from '../services/trainingService'
 
 const TrainingPage = () => {
@@ -176,7 +176,7 @@ const TrainingPage = () => {
   const getIconComponent = (iconName) => {
     const icons = {
       mail: Mail,
-      shield: Shield,
+      shield: Lock,
       award: Award,
       link: LinkIcon,
       paperclip: Paperclip,
@@ -221,24 +221,19 @@ const TrainingPage = () => {
     return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern py-4 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-6 sm:mb-8 animate-fade-in">
+      <div className="mb-6 animate-fade-in">
         <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-2 sm:p-3 rounded-xl shadow-lg">
-          <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-          </div>
         <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-white">
             Security <span className="text-gradient">Training</span>
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base lg:text-lg mt-1 hidden sm:block">Learn to identify and protect against email threats</p>
+          <p className="text-slate-400 text-xs mt-1">Learn to identify and protect against email threats</p>
           </div>
-        </div>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 text-cyan-400 hover:bg-slate-800/50 rounded-lg border border-cyan-500/30"
             >
-              {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
@@ -278,7 +273,7 @@ const TrainingPage = () => {
             {currentSection && (
               <>
                 {/* Content Section */}
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-4 sm:p-6 md:p-8">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-4 sm:p-5">
                   <div 
                     className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-strong:text-white prose-ul:text-slate-300 prose-li:text-slate-300 prose-sm sm:prose-base"
                     dangerouslySetInnerHTML={{ __html: currentSection.content }}
@@ -288,8 +283,8 @@ const TrainingPage = () => {
                 {/* Examples Section */}
                 {currentSection.examples && currentSection.examples.length > 0 && (
                   <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-4 sm:p-6 md:p-8">
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
-                      <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-cyan-400" />
+                    <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                      <Eye className="h-5 w-5 text-cyan-400" />
                       Real Examples
                     </h3>
                     <div className="space-y-3 sm:space-y-4">
@@ -330,9 +325,9 @@ const TrainingPage = () => {
 
                 {/* Quiz Section */}
                 {currentSection.quiz && currentSection.quiz.length > 0 && (
-                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6 md:p-8">
-                    <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                      <Target className="h-6 w-6 text-purple-400" />
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 p-5">
+                    <h3 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
+                      <Target className="h-5 w-5 text-purple-400" />
                       Test Your Knowledge
                     </h3>
                     <div className="space-y-6">

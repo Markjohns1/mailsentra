@@ -58,6 +58,19 @@ const PublicRoute = ({ children }) => {
 }
 
 function AppRoutes() {
+  const { loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 bg-grid-pattern">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-cyan-500 mx-auto mb-4 cyber-glow"></div>
+          <p className="text-white text-xl font-bold animate-pulse-slow">Initializing MailSentra...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern">
@@ -79,11 +92,7 @@ function AppRoutes() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <ToastProvider>
-          <AppRoutes />
-        </ToastProvider>
-      </AuthProvider>
+      <AppRoutes />
     </Router>
   )
 }

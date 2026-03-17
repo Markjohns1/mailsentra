@@ -26,7 +26,12 @@ def main():
         # Check if an admin with this email already exists
         user = db.query(User).filter(User.email == email).first()
         if user:
-            print(f"Admin already exists: {user.email} | is_admin = {user.is_admin}")
+            print(f"Updating password for existing admin: {user.email}")
+            user.hashed_password = get_password_hash(password)
+            user.is_admin = True
+            user.is_active = True
+            db.commit()
+            print(f"Admin user updated successfully.")
             return
 
         # Create new admin user

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Shield, LogOut, LayoutDashboard, Settings, BookOpen, Menu, X } from 'lucide-react'
+import { LogOut, LayoutDashboard, Settings, BookOpen, Menu, X } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const Navbar = () => {
@@ -10,18 +10,15 @@ const Navbar = () => {
   const closeMenu = () => setMobileMenuOpen(false)
 
   return (
-    <nav className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 backdrop-blur-sm shadow-2xl sticky top-0 z-50">
+    <nav className="bg-slate-900/80 border-b border-slate-800 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-90 transition-all group">
-            {/*<div className="bg-gradient-to-br from-cyan-500 to-blue-600 p-1.5 sm:p-2 rounded-lg shadow-lg group-hover:shadow-cyan-500/50 transition-shadow">
-              <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-            </div>*/}
-            <span className="text-xl sm:text-2xl font-extrabold text-gradient">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-all">
+            <span className="text-lg font-extrabold text-white tracking-tight">
               MailSentra
             </span>
-            <span className="text-xs text-cyan-400/70 font-mono hidden sm:inline">v1.0</span>
+            <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">v2.9</span>
           </Link>
 
           {/* Desktop Menu */}

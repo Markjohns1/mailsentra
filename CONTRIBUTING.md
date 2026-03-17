@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to MailSentra! This document provides guidelines and instructions for contributing.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
@@ -12,7 +12,7 @@ Thank you for your interest in contributing to MailSentra! This document provide
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
 
-## 📜 Code of Conduct
+## Code of Conduct
 
 ### Our Pledge
 
@@ -33,7 +33,7 @@ We are committed to providing a welcoming and inclusive environment for all cont
 - Publishing others' private information without permission
 - Other conduct which could reasonably be considered inappropriate
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -82,7 +82,7 @@ Before contributing, ensure you have:
    git checkout -b feature/your-feature-name
    ```
 
-## 🤝 How to Contribute
+## How to Contribute
 
 ### Reporting Bugs
 
@@ -135,7 +135,7 @@ Feature requests are welcome! Please provide:
 5. **Test your changes** thoroughly
 6. **Submit a pull request**
 
-## 🔄 Development Workflow
+## Development Workflow
 
 ### 1. Keep Your Fork Updated
 
@@ -210,7 +210,7 @@ git push origin feature/amazing-feature
 - Fill out the PR template
 - Submit!
 
-## 📝 Coding Standards
+## Coding Standards
 
 ### Python (Backend)
 
@@ -305,7 +305,7 @@ function emailAnalyzer(props) {
 - Keep functions small and focused
 - Use meaningful variable names
 
-## 📋 Commit Guidelines
+## Commit Guidelines
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -347,7 +347,7 @@ git commit -m "feat(api)!: change authentication endpoint structure
 BREAKING CHANGE: /auth/login now requires email instead of username"
 ```
 
-## 🔍 Pull Request Process
+## Pull Request Process
 
 ### Before Submitting
 
@@ -397,7 +397,7 @@ Closes #123
 3. Once approved, your PR will be merged
 4. Your contribution will be acknowledged in the changelog
 
-## 🎯 Areas for Contribution
+## Areas for Contribution
 
 ### Good First Issues
 
@@ -414,20 +414,20 @@ Look for issues tagged with:
 - Performance optimizations
 - UI/UX improvements
 
-## 💡 Need Help?
+## Need Help?
 
 - 📧 Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
 - 💬 GitHub Issues: [Create an issue](https://github.com/Markjohns1/mailsentra/issues)
 - 📖 Documentation: [docs/](../docs/)
 
-## 🙏 Recognition
+## Recognition
 
 All contributors will be recognized in:
 - README.md contributors section
 - CHANGELOG.md for each release
 - GitHub contributors page
 
-Thank you for contributing to MailSentra! 🎉
+Thank you for contributing to MailSentra!
 
 ---
 

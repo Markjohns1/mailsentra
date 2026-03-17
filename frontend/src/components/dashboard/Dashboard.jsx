@@ -38,14 +38,11 @@ const Dashboard = ({ user }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 bg-grid-pattern py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto animate-fade-in">
-        <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3">
-            Welcome back, <span className="text-gradient">{user?.username}</span>
+        <div className="mb-6">
+          <h1 className="text-2xl font-extrabold text-white mb-1 tracking-tight">
+            Welcome, {user?.username}
           </h1>
-          <p className="text-slate-400 text-lg flex items-center gap-2">
-            <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse-slow"></span>
-            AI-powered spam detection & threat analysis
-          </p>
+          <p className="text-slate-400">Analysis metrics and system status</p>
         </div>
 
         {loading ? (
@@ -57,35 +54,36 @@ const Dashboard = ({ user }) => {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <StatsCard
                 title="Total Analyses"
                 value={stats.total_analyses}
-                icon={<BarChart3 className="w-10 h-10" />}
+                icon={<BarChart3 className="w-6 h-6" />}
                 color="blue"
               />
               <StatsCard
                 title="Spam Detected"
                 value={stats.spam_detected}
-                icon={<AlertTriangle className="w-10 h-10" />}
+                icon={<AlertTriangle className="w-6 h-6" />}
                 color="red"
               />
               <StatsCard
                 title="Ham Detected"
                 value={stats.ham_detected}
-                icon={<CheckCircle className="w-10 h-10" />}
+                icon={<CheckCircle className="w-6 h-6" />}
                 color="green"
               />
               <StatsCard
                 title="Accuracy Rate"
                 value={`${stats.accuracy_rate.toFixed(1)}%`}
-                icon={<TrendingUp className="w-10 h-10" />}
+                icon={<TrendingUp className="w-6 h-6" />}
                 color="purple"
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AnalyzeEmail onAnalyzeComplete={onAnalyzeComplete} />
+            <AnalyzeEmail onAnalyzeComplete={onAnalyzeComplete} />
+
+            <div className="mt-4">
               <LogsTable />
             </div>
           </>

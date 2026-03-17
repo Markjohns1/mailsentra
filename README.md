@@ -9,7 +9,7 @@
 
 **Enterprise-Grade Email Spam Detection Platform**
 
-[Features](#features) • [Quick Start](#quick-start) • [Documentation](docs/) • [API Reference](docs/API.md) • [Contributing](CONTRIBUTING.md)
+[Features](#features) • [Quick Start](#quick-start) • [Documentation](SYSTEM_DOCUMENTATION.md) • [API Reference](SYSTEM_DOCUMENTATION.md#chapter-five-api-reference) • [Contributing](SYSTEM_DOCUMENTATION.md#chapter-seven-development--contribution)
 
 ---
 
@@ -17,7 +17,7 @@ MailSentra is a production-ready, full-stack email spam detection system powered
 
 ## Key Features
 
-- **Real-time Classification**: Analyze emails instantly with 95%+ accuracy
+- **Real-time Classification**: Analyze emails instantly with 98%+ accuracy (v2.7 Elite)
 - **Adaptive Learning**: Model improves continuously from user feedback
 - **Enterprise Security**: JWT authentication, rate limiting, and audit logs
 - **Scalable Architecture**: Microservices-ready with Docker support
@@ -39,7 +39,7 @@ MailSentra is a production-ready, full-stack email spam detection system powered
                      └──────────────┘
 ```
 
-## 📊 Features Status
+## Features Status
 
 | Feature | Description | Status |
 |---------|-------------|--------|
@@ -127,12 +127,12 @@ npm run dev
 
 | Document | Description |
 |----------|-------------|
-| [Architecture](docs/ARCHITECTURE.md) | System design and component interactions |
-| [API Reference](docs/API.md) | Complete API endpoint documentation |
-| [Development Guide](docs/DEVELOPMENT.md) | Setup and development workflows |
-| [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment instructions |
-| [Training Guide](docs/TRAINING_GUIDE.md) | **NEW!** Model training & dataset management |
-| [Training Quick Start](docs/TRAINING_QUICK_START.md) | Quick reference for training workflows |
+| [Full System Documentation](SYSTEM_DOCUMENTATION.md) | Comprehensive overview of architecture, API, and guides |
+| [Architecture](SYSTEM_DOCUMENTATION.md#chapter-three-technical-architecture) | System design and component interactions |
+| [API Reference](SYSTEM_DOCUMENTATION.md#chapter-five-api-reference) | Complete API endpoint documentation |
+| [Development & Contributing](SYSTEM_DOCUMENTATION.md#chapter-seven-development--contribution) | Setup and development workflows |
+| [Deployment Guide](SYSTEM_DOCUMENTATION.md#chapter-eight-deployment-guide) | Production deployment instructions |
+| [Training Guide](SYSTEM_DOCUMENTATION.md#chapter-six-user--training-guide) | Model training & dataset management |
 
 ## Technology Stack
 
@@ -140,8 +140,9 @@ npm run dev
 - **FastAPI 0.104.1** - Modern, fast web framework
 - **SQLAlchemy** - Database ORM
 - **Alembic** - Database migrations
-- **Scikit-learn** - Machine learning
+- **Scikit-learn** - Machine learning (Logistic Regression / Precision Tuned)
 - **NLTK** - Natural language processing
+- **Email Corpora** - Trained on SpamAssassin & Enron workplace datasets
 - **BeautifulSoup4** - HTML parsing
 - **Passlib** - Password hashing
 - **PyJWT** - JWT authentication
@@ -172,8 +173,10 @@ mailsentra/
 │   │   ├── services/         # Business logic
 │   │   └── utils/            # Utilities
 │   ├── dataset/              # Training data
-│   ├── ml_models/            # Trained models
-│   ├── tests/                # Unit tests
+│   │   └── raw_archives/     # Cleaned original archives
+│   ├── ml_models/            # Trained models (v2.7 Production)
+│   ├── scripts/              # Utility scripts (extraction, etc.)
+│   ├── tests/                # Unit and validation tests
 │   ├── main.py               # Application entry point
 │   └── requirements.txt      # Python dependencies
 ├── frontend/
@@ -182,9 +185,8 @@ mailsentra/
 │       ├── context/          # State management
 │       ├── pages/            # Page components
 │       └── services/         # API services
-├── docs/                     # Documentation
 ├── README.md                 # This file
-├── CONTRIBUTING.md           # Contribution guidelines
+├── SYSTEM_DOCUMENTATION.md   # Complete system documentation
 └── LICENSE                   # MIT License
 ```
 
@@ -218,7 +220,7 @@ docker-compose down
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+We welcome contributions! Please see our [Contributing Guide](SYSTEM_DOCUMENTATION.md#chapter-seven-development--contribution) for details on:
 - Code of Conduct
 - Development process
 - Submitting pull requests
@@ -239,7 +241,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Email: [johnmarkoguta@gmail.com](mailto:johnmarkoguta@gmail.com)
 - Issues: [GitHub Issues](https://github.com/Markjohns1/mailsentra/issues)
-- Documentation: [docs/](docs/)
+- Documentation: [SYSTEM_DOCUMENTATION.md](SYSTEM_DOCUMENTATION.md)
 
 ## Acknowledgments
 
@@ -259,6 +261,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with L❤️ by John O. Mark**
+**Made by John O. Mark**
 
-*Version 1.0.0 - Last updated: October 2024*
+*Version 2.7.0 - Last updated: March 17, 2026*

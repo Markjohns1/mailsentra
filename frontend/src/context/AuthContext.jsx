@@ -20,20 +20,17 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token')
       const userStr = localStorage.getItem('user')
   
-      if (token && userStr) {
+      if (token) {
         try {
-          const userData = JSON.parse(userStr)
-          setUser(userData)
-        } catch (error) {
-          localStorage.removeItem('user')
-        }
-      } else if (token) {
-        try {
+          // Always verify token with backend to ensure it's not expired
           const userData = await authService.getMe()
           setUser(userData)
           localStorage.setItem('user', JSON.stringify(userData))
         } catch (error) {
+          console.error("Auth initialization failed:", error)
           localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          setUser(null)
         }
       }
       setLoading(false)

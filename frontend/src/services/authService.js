@@ -1,13 +1,13 @@
 ﻿import axios from 'axios'
 
-const BASE_URL = 'http://localhost:8000/api/auth'
+const BASE_URL = '/api/auth'
 
 export const authService = {
   async login(email, password) {
     const formData = new FormData()
     formData.append('username', email)
     formData.append('password', password)
-    
+
     const response = await axios.post(`${BASE_URL}/login`, formData)
     return response.data
   },

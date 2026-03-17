@@ -1,6 +1,6 @@
 # Model Training & Retraining Guide
 
-## 📚 Overview
+## Overview
 
 This guide explains how to train and retrain the spam detection model using different datasets. The system supports multiple training methods:
 
@@ -10,7 +10,7 @@ This guide explains how to train and retrain the spam detection model using diff
 
 ---
 
-## 🎯 Quick Start
+## Quick Start
 
 ### Option 1: Train with Default Dataset (Easiest)
 
@@ -37,7 +37,7 @@ This guide explains how to train and retrain the spam detection model using diff
 
 ---
 
-## 📋 Dataset Format Requirements
+## Dataset Format Requirements
 
 ### CSV File Structure
 
@@ -136,7 +136,7 @@ ham	Hey how are you doing?
 
 ---
 
-## 🚀 Step-by-Step: Upload & Train
+## Step-by-Step: Upload & Train
 
 ### Via Admin UI (Recommended)
 
@@ -183,7 +183,7 @@ print(f"Accuracy: {train_response.json()['training_stats']['accuracy']}")
 
 ---
 
-## 📊 Understanding Training Output
+## Understanding Training Output
 
 ### Model Metadata
 
@@ -211,7 +211,7 @@ The training shows:
 
 ---
 
-## 🔄 Retraining Best Practices
+## Retraining Best Practices
 
 ### When to Retrain
 
@@ -294,7 +294,7 @@ You can modify `train_model.py` to adjust:
 
 ---
 
-## ⚠️ Troubleshooting
+## Troubleshooting
 
 ### "Dataset file not found"
 
@@ -349,7 +349,7 @@ You can modify `train_model.py` to adjust:
 
 ---
 
-## 📈 Model Versioning
+## Model Versioning
 
 ### How Versions Work
 
@@ -367,7 +367,7 @@ You can modify `train_model.py` to adjust:
 
 ---
 
-## 🎓 ML Concepts (For Reference)
+## ML Concepts (For Reference)
 
 ### What Happens During Training?
 
@@ -394,7 +394,7 @@ When retraining, the system:
 
 ---
 
-## 💡 Tips & Best Practices
+## Tips & Best Practices
 
 1. **Start with default dataset** for baseline
 2. **Collect feedback** from real users
@@ -407,7 +407,7 @@ When retraining, the system:
 
 ---
 
-## 📞 Support
+## Support
 
 If you encounter issues:
 1. Check logs in backend console

@@ -44,15 +44,15 @@ const LogsTable = () => {
   }
 
   return (
-    <div className="card-cyber p-6 rounded-xl shadow-2xl animate-fade-in border-purple-500/20">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="card-cyber p-5 rounded-lg border-purple-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-3 rounded-lg border border-purple-500/30">
-            <History className="h-6 w-6 text-purple-400" />
+          <div className="bg-slate-800/50 p-2 rounded-lg border border-slate-700">
+            <History className="h-5 w-5 text-purple-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Recent Analysis</h2>
-            <p className="text-sm text-slate-400">Activity log</p>
+            <h2 className="text-lg font-bold text-white">Recent Analysis</h2>
+            <p className="text-xs text-slate-400">Activity log</p>
           </div>
         </div>
         

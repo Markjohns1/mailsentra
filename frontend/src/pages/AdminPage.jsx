@@ -1,7 +1,7 @@
 import TrainingContentManager from '../components/dashboard/TrainingContentManager'
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Shield, Upload, FileText as FileTextIcon, BookOpen } from 'lucide-react'
+import { Menu, X, AlertCircle, CheckCircle, Clock, Zap, Trash2, Edit2, Power, Eye, Check, XCircle, Upload, FileText as FileTextIcon, BookOpen } from 'lucide-react'
 import { LayoutDashboard, Users, FileText, MessageSquare, Cpu } from 'lucide-react'
 
 const useAuth = () => {
@@ -16,7 +16,7 @@ const useToast = () => ({
 })
 
 
-const API_BASE_URL = 'http://localhost:8000/api'
+const API_BASE_URL = '/api'
 
 export default function AdminPage() {
   const { user } = useAuth() || {}
@@ -174,29 +174,29 @@ export default function AdminPage() {
       showError?.('Only CSV files are supported')
       return
     }
-    
+
     setUploadingDataset(true)
     const formData = new FormData()
     formData.append('file', file)
-    
+
     try {
       const token = localStorage.getItem('token')
       const headers = {}
       if (token) {
         headers['Authorization'] = `Bearer ${token}`
       }
-      
+
       const res = await fetch(`${API_BASE_URL}/retrain/upload-dataset`, {
         method: 'POST',
         headers: headers,
         body: formData
       })
-      
+
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.detail || 'Upload failed')
       }
-      
+
       const data = await res.json()
       setUploadedDataset(data)
       showSuccess?.(`Dataset uploaded! ${data.total_samples} samples (${data.spam_samples} spam, ${data.ham_samples} ham)`)
@@ -210,14 +210,14 @@ export default function AdminPage() {
 
   const triggerInitialTrain = async (customDatasetPath = null) => {
     console.log('🚀 triggerInitialTrain called')
-    const msg = customDatasetPath 
+    const msg = customDatasetPath
       ? `Train model with uploaded dataset? This will take a few minutes.`
       : `Train model from scratch? This will take a few minutes.`
     if (!confirm(msg)) {
       console.log('❌ User cancelled')
       return
     }
-    
+
     console.log('✅ Starting training...')
     setRetraining(true)
     try {
@@ -228,17 +228,17 @@ export default function AdminPage() {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`
       }
-      
+
       const body = customDatasetPath ? { dataset_path: customDatasetPath } : null
-      
+
       const res = await fetch(`${API_BASE_URL}/retrain/train`, {
         method: 'POST',
         headers: headers,
         body: body ? JSON.stringify(body) : null
       })
-      
+
       console.log('📥 Response status:', res.status)
-      
+
       if (!res.ok) {
         const errorData = await res.json()
         throw new Error(errorData.detail || 'Training failed')
@@ -275,8 +275,8 @@ export default function AdminPage() {
 
   const viewFeedbackDetails = async (feedbackId) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/feedback/${feedbackId}/details`, { 
-        headers: getHeaders() 
+      const res = await fetch(`${API_BASE_URL}/feedback/${feedbackId}/details`, {
+        headers: getHeaders()
       })
       if (!res.ok) throw new Error('Failed to load feedback details')
       const data = await res.json()
@@ -287,7 +287,7 @@ export default function AdminPage() {
   }
 
   const deleteOldLogs = async (daysOld) => {
-    const confirmMsg = daysOld === 0 
+    const confirmMsg = daysOld === 0
       ? '⚠️ Delete ALL logs immediately? This cannot be undone!'
       : `Delete all logs older than ${daysOld} day${daysOld === 1 ? '' : 's'}?`
     if (!confirm(confirmMsg)) return
@@ -371,15 +371,15 @@ export default function AdminPage() {
     }
   }
 
-const tabs = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { id: 'users', label: 'Users', icon: <Users size={20} /> },
-  { id: 'logs', label: 'Logs', icon: <FileText size={20} /> },
-  { id: 'feedback', label: 'Feedback', icon: <MessageSquare size={20} /> },
-  { id: 'model', label: 'Model', icon: <Cpu size={20} /> },
-  { id: 'cleanup', label: 'Cleanup', icon: <Trash2 size={20} /> },
-  { id: 'training', label: 'Training Content', icon: <BookOpen size={20} /> }  // ADD THIS LINE
-]
+  const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { id: 'users', label: 'Users', icon: <Users size={20} /> },
+    { id: 'logs', label: 'Logs', icon: <FileText size={20} /> },
+    { id: 'feedback', label: 'Feedback', icon: <MessageSquare size={20} /> },
+    { id: 'model', label: 'Model', icon: <Cpu size={20} /> },
+    { id: 'cleanup', label: 'Cleanup', icon: <Trash2 size={20} /> },
+    { id: 'training', label: 'Training Content', icon: <BookOpen size={20} /> }  // ADD THIS LINE
+  ]
 
   const chartData = [
     { name: 'Spam', value: metrics?.spam_detected || 0 },
@@ -413,7 +413,6 @@ const tabs = [
         <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
           {sidebarOpen && (
             <h1 className="text-xl font-extrabold text-gradient flex items-center gap-2">
-              <Shield className="h-5 w-5 text-cyan-400" />
               MailSentra
             </h1>
           )}
@@ -427,11 +426,10 @@ const tabs = [
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all border ${
-                activeTab === tab.id
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all border ${activeTab === tab.id
                   ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white border-cyan-500/50 shadow-lg shadow-cyan-500/20'
                   : 'text-slate-400 hover:bg-slate-800/50 hover:text-cyan-300 border-transparent hover:border-cyan-500/30'
-              }`}
+                }`}
             >
               <span className="text-xl">{tab.icon}</span>
               {sidebarOpen && <span className="font-medium">{tab.label}</span>}
@@ -452,33 +450,33 @@ const tabs = [
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-7xl mx-auto">
           <div className="mb-8 animate-fade-in">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-white mb-2">
               Admin <span className="text-gradient">Dashboard</span>
             </h1>
-            <p className="text-slate-400 text-sm sm:text-base md:text-lg flex items-center gap-2">
-              <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse-slow"></span>
+            <p className="text-slate-400 text-xs sm:text-sm flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse-slow"></span>
               System monitoring and management
             </p>
           </div>
 
           {activeTab === 'dashboard' && metrics && (
             <div className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="card-cyber bg-gradient-to-br from-cyan-600/20 to-blue-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-cyan-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Total Scans</h3>
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{metrics.total_scans.toLocaleString()}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="card-cyber bg-gradient-to-br from-cyan-600/20 to-blue-600/20 p-4 rounded-xl shadow-lg border-2 border-cyan-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xxs sm:text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Total Scans</h3>
+                  <p className="text-xl sm:text-2xl font-extrabold text-white">{metrics.total_scans.toLocaleString()}</p>
                 </div>
-                <div className="card-cyber bg-gradient-to-br from-red-600/20 to-rose-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-red-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Spam Detected</h3>
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{metrics.spam_detected.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-red-600/20 to-rose-600/20 p-4 rounded-xl shadow-lg border-2 border-red-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xxs sm:text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Spam Detected</h3>
+                  <p className="text-xl sm:text-2xl font-extrabold text-white">{metrics.spam_detected.toLocaleString()}</p>
                 </div>
-                <div className="card-cyber bg-gradient-to-br from-green-600/20 to-emerald-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-green-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Total Users</h3>
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{metrics.total_users.toLocaleString()}</p>
+                <div className="card-cyber bg-gradient-to-br from-green-600/20 to-emerald-600/20 p-4 rounded-xl shadow-lg border-2 border-green-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xxs sm:text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Total Users</h3>
+                  <p className="text-xl sm:text-2xl font-extrabold text-white">{metrics.total_users.toLocaleString()}</p>
                 </div>
-                <div className="card-cyber bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-4 sm:p-6 rounded-xl shadow-lg border-2 border-purple-500/30 backdrop-blur-sm animate-fade-in">
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3 uppercase tracking-wider">Accuracy</h3>
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white">{Number(metrics.accuracy_rate).toFixed(2)}%</p>
+                <div className="card-cyber bg-gradient-to-br from-purple-600/20 to-indigo-600/20 p-4 rounded-xl shadow-lg border-2 border-purple-500/30 backdrop-blur-sm animate-fade-in">
+                  <h3 className="text-xxs sm:text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">Accuracy</h3>
+                  <p className="text-xl sm:text-2xl font-extrabold text-white">{Number(metrics.accuracy_rate).toFixed(2)}%</p>
                 </div>
               </div>
 
@@ -487,14 +485,14 @@ const tabs = [
                   <h3 className="text-base sm:text-lg font-semibold text-white mb-4">Spam vs Ham</h3>
                   <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
                     <PieChart>
-                      <Pie 
-                        data={chartData} 
-                        cx="50%" 
-                        cy="50%" 
-                        labelLine={false} 
-                        label={isMobile ? false : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} 
-                        outerRadius={isMobile ? 50 : 80} 
-                        fill="#8884d8" 
+                      <Pie
+                        data={chartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={isMobile ? false : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={isMobile ? 50 : 80}
+                        fill="#8884d8"
                         dataKey="value"
                       >
                         {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index]} />)}
@@ -535,7 +533,7 @@ const tabs = [
                       <input
                         type="text"
                         value={editForm.username}
-                        onChange={(e) => setEditForm({...editForm, username: e.target.value})}
+                        onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
                         className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
                       />
                     </div>
@@ -544,7 +542,7 @@ const tabs = [
                       <input
                         type="email"
                         value={editForm.email}
-                        onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                         className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
                       />
                     </div>
@@ -554,18 +552,18 @@ const tabs = [
                         <input
                           type="password"
                           value={editForm.password || ''}
-                          onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+                          onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
                           className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-blue-500"
                         />
                       </div>
                     )}
                     <div className="flex gap-6">
                       <label className="flex items-center gap-2 text-slate-300">
-                        <input type="checkbox" checked={editForm.is_active} onChange={(e) => setEditForm({...editForm, is_active: e.target.checked})} className="w-4 h-4 rounded" />
+                        <input type="checkbox" checked={editForm.is_active} onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })} className="w-4 h-4 rounded" />
                         Active
                       </label>
                       <label className="flex items-center gap-2 text-slate-300">
-                        <input type="checkbox" checked={editForm.is_admin} onChange={(e) => setEditForm({...editForm, is_admin: e.target.checked})} className="w-4 h-4 rounded" />
+                        <input type="checkbox" checked={editForm.is_admin} onChange={(e) => setEditForm({ ...editForm, is_admin: e.target.checked })} className="w-4 h-4 rounded" />
                         Admin
                       </label>
                     </div>
@@ -583,7 +581,7 @@ const tabs = [
                 <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
                   <div className="px-6 py-4 border-b border-slate-700 flex justify-between">
                     <h2 className="text-xl font-bold text-white">Users ({users.length})</h2>
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingUser('new')
                         setEditForm({ username: '', email: '', password: '', is_active: true, is_admin: false })
@@ -634,50 +632,50 @@ const tabs = [
                           ))}
                         </div>
                       ) : (
-                      <table className="w-full">
-                        <thead className="bg-slate-700/50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">ID</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Username</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Role</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-700">
-                          {users.map((u) => (
-                            <tr key={u.id} className="hover:bg-slate-700/30">
-                              <td className="px-6 py-4 text-sm text-slate-300">{u.id}</td>
-                              <td className="px-6 py-4 text-sm font-medium text-white">{u.username}</td>
-                              <td className="px-6 py-4 text-sm text-slate-300">{u.email}</td>
-                              <td className="px-6 py-4">
-                                <span className={`px-3 py-1 text-xs rounded ${u.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                                  {u.is_active ? 'Active' : 'Inactive'}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4">
-                                <span className={`px-3 py-1 text-xs rounded ${u.is_admin ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-500/20 text-slate-400'}`}>
-                                  {u.is_admin ? 'Admin' : 'User'}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 text-sm flex gap-2">
-                                <button onClick={() => openEditUser(u)} title="Edit" className="p-2 hover:bg-slate-700 rounded text-blue-400 hover:text-blue-300">
-                                  <Edit2 size={16} />
-                                </button>
-                                <button onClick={() => toggleUserStatus(u.id, u.is_active)} title="Toggle Status" className="p-2 hover:bg-slate-700 rounded text-yellow-400 hover:text-yellow-300">
-                                  <Power size={16} />
-                                </button>
-                                {u.id !== user?.id && (
-                                  <button onClick={() => deleteUser(u.id)} title="Delete" className="p-2 hover:bg-slate-700 rounded text-red-400 hover:text-red-300">
-                                    <Trash2 size={16} />
-                                  </button>
-                                )}
-                              </td>
+                        <table className="w-full">
+                          <thead className="bg-slate-700/50">
+                            <tr>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">ID</th>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Username</th>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Email</th>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Status</th>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Role</th>
+                              <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">Actions</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="divide-y divide-slate-700">
+                            {users.map((u) => (
+                              <tr key={u.id} className="hover:bg-slate-700/30">
+                                <td className="px-6 py-4 text-sm text-slate-300">{u.id}</td>
+                                <td className="px-6 py-4 text-sm font-medium text-white">{u.username}</td>
+                                <td className="px-6 py-4 text-sm text-slate-300">{u.email}</td>
+                                <td className="px-6 py-4">
+                                  <span className={`px-3 py-1 text-xs rounded ${u.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                                    {u.is_active ? 'Active' : 'Inactive'}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className={`px-3 py-1 text-xs rounded ${u.is_admin ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-500/20 text-slate-400'}`}>
+                                    {u.is_admin ? 'Admin' : 'User'}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-sm flex gap-2">
+                                  <button onClick={() => openEditUser(u)} title="Edit" className="p-2 hover:bg-slate-700 rounded text-blue-400 hover:text-blue-300">
+                                    <Edit2 size={16} />
+                                  </button>
+                                  <button onClick={() => toggleUserStatus(u.id, u.is_active)} title="Toggle Status" className="p-2 hover:bg-slate-700 rounded text-yellow-400 hover:text-yellow-300">
+                                    <Power size={16} />
+                                  </button>
+                                  {u.id !== user?.id && (
+                                    <button onClick={() => deleteUser(u.id)} title="Delete" className="p-2 hover:bg-slate-700 rounded text-red-400 hover:text-red-300">
+                                      <Trash2 size={16} />
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       )}
                     </div>
                   )}
@@ -932,16 +930,16 @@ const tabs = [
                               </td>
                               <td className="px-6 py-4 text-sm text-slate-400 font-mono">{new Date(f.created_at).toLocaleDateString()}</td>
                               <td className="px-6 py-4 text-sm flex gap-2">
-                                <button 
-                                  onClick={() => viewFeedbackDetails(f.id)} 
-                                  title="View Details" 
+                                <button
+                                  onClick={() => viewFeedbackDetails(f.id)}
+                                  title="View Details"
                                   className="p-2 hover:bg-slate-700 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
                                 >
                                   <Eye size={18} />
                                 </button>
-                                <button 
-                                  onClick={() => deleteFeedback(f.id)} 
-                                  title="Delete" 
+                                <button
+                                  onClick={() => deleteFeedback(f.id)}
+                                  title="Delete"
                                   className="p-2 hover:bg-slate-700 rounded-lg text-red-400 hover:text-red-300 transition-colors"
                                 >
                                   <Trash2 size={18} />
@@ -977,7 +975,7 @@ const tabs = [
                     <div className="bg-slate-800/50 p-4 rounded border border-slate-700">
                       <p className="text-sm text-slate-400 mb-2">Status</p>
                       <p className={`text-2xl font-bold ${retrainStatus.ready_to_retrain ? 'text-green-400' : 'text-yellow-400'}`}>
-                        {retrainStatus.ready_to_retrain ? '✓ Ready' : '⏳ Pending'}
+                        {retrainStatus.ready_to_retrain ? '✓ Ready' : 'Pending'}
                       </p>
                     </div>
                   </div>
@@ -1002,7 +1000,7 @@ const tabs = [
                       <p className="text-sm text-slate-400">Upload a CSV file with 'label' and 'message' columns</p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="flex gap-3">
                       <label className="flex-1 cursor-pointer">
@@ -1016,11 +1014,10 @@ const tabs = [
                           className="hidden"
                           disabled={uploadingDataset}
                         />
-                        <div className={`w-full px-4 py-3 bg-slate-900/50 border-2 border-dashed rounded-lg transition-all flex items-center justify-center gap-2 ${
-                          uploadingDataset
+                        <div className={`w-full px-4 py-3 bg-slate-900/50 border-2 border-dashed rounded-lg transition-all flex items-center justify-center gap-2 ${uploadingDataset
                             ? 'border-slate-600 text-slate-500 cursor-not-allowed'
                             : 'border-cyan-500/50 hover:border-cyan-500 text-cyan-300 hover:bg-cyan-500/10'
-                        }`}>
+                          }`}>
                           {uploadingDataset ? (
                             <>
                               <div className="animate-spin rounded-full h-5 w-5 border-2 border-cyan-500/30 border-t-cyan-400"></div>
@@ -1035,7 +1032,7 @@ const tabs = [
                         </div>
                       </label>
                     </div>
-                    
+
                     {uploadedDataset && (
                       <div className="bg-green-500/10 border border-green-500/50 rounded-lg p-4 animate-fade-in">
                         <div className="flex items-start justify-between mb-3">
@@ -1093,9 +1090,8 @@ const tabs = [
                   <button
                     onClick={() => triggerInitialTrain()}
                     disabled={retraining}
-                    className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-                      !retraining ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg hover:shadow-blue-500/50' : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                    }`}
+                    className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${!retraining ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg hover:shadow-blue-500/50' : 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                      }`}
                   >
                     {retraining ? (
                       <>
@@ -1113,11 +1109,10 @@ const tabs = [
                   <button
                     onClick={triggerRetrain}
                     disabled={!retrainStatus?.ready_to_retrain || retraining}
-                    className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-                      retrainStatus?.ready_to_retrain && !retraining
+                    className={`py-4 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${retrainStatus?.ready_to_retrain && !retraining
                         ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg'
                         : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                    }`}
+                      }`}
                   >
                     {retraining ? (
                       <>
@@ -1203,7 +1198,7 @@ const tabs = [
                     <p className="text-slate-400 text-sm">Clean up old logs and system data</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                     <button
@@ -1299,7 +1294,7 @@ const tabs = [
               </div>
             </div>
           )}
-{activeTab === 'training' && (
+          {activeTab === 'training' && (
             <div className="animate-fade-in">
               <TrainingContentManager />
             </div>
