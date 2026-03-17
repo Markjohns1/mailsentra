@@ -1,42 +1,28 @@
 @echo off
+set "ROOT=c:\Users\User\Desktop\mailsentra"
 echo ================================================
-echo MailSentra - Project Cleanup and Push
+echo MailSentra - Hard Cleanup and Production Push
 echo ================================================
 echo.
 
-echo [*] Cleaning redundant files...
-if exist "ml_models" (
-    echo [!] Removing redundant root ml_models folder...
-    rmdir /s /q "ml_models"
-)
+echo [*] Cleaning root clutters...
+powershell -Command "Remove-Item -Path '%ROOT%\clean_docs.py', '%ROOT%\THE_MAILSENTRA_SYSTEM.md' -ErrorAction SilentlyContinue"
 
-if exist "backend\dataset\temp_extract" (
-    echo [!] Cleaning temp extraction data...
-    rmdir /s /q "backend\dataset\temp_extract"
-)
+echo [*] Cleaning Backend Models (Keeping only v2.9)...
+powershell -Command "Get-ChildItem -Path '%ROOT%\backend\ml_models\spam_model_v*' | Where-Object { $_.Name -notlike '*v2.9*' } | Remove-Item -Force"
 
-if exist "backend\dataset\extracted" (
-    echo [!] Cleaning extracted archives...
-    rmdir /s /q "backend\dataset\extracted"
-)
-
-if exist "THE_MAILSENTRA_SYSTEM.md" (
-    echo [!] Removing redundant old documentation...
-    del /f /q "THE_MAILSENTRA_SYSTEM.md"
-)
+echo [*] Cleaning Dataset shrapnel...
+powershell -Command "Remove-Item -Path '%ROOT%\backend\dataset\temp_extract', '%ROOT%\backend\dataset\extracted' -Recurse -Force -ErrorAction SilentlyContinue"
 
 echo.
-echo [*] Staging changes for Git...
+echo [*] Committing and Pushing to Git...
+cd /d "%ROOT%"
 git add .
-
-echo [*] Committing...
-git commit -m "Production: System-wide UI polish, Model v2.9 accuracy tuning, and threshold improvements"
-
-echo [*] Pushing to remote...
+git commit -m "Production: Cleaned repository, Model v2.9, and UI polish"
 git push
 
 echo.
 echo ================================================
-echo Done! Project is clean and pushed.
+echo DONE! Check your folder - clean_docs and old models are GONE.
 echo ================================================
 pause
